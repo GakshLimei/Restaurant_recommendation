@@ -1,4 +1,4 @@
-package org.niit.been
+package org.niit.bean
 
 /**
  * @作者 YanTianCheng
