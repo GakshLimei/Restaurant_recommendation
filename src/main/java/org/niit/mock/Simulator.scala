@@ -32,7 +32,7 @@ object Simulator {
   //城市ID
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6")
   //餐厅ID
-  val arr4 = Array("餐厅ID_1_", "餐厅ID_2_", "餐厅ID_3_","餐厅ID_4_")
+  val arr4 = Array("餐厅ID_1_", "餐厅ID_2_", "餐厅ID_3_", "餐厅ID_4_")
   //菜品ID
   val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3")
 
@@ -78,30 +78,31 @@ object Simulator {
     //随机订单ID
     val ordersRandom = ordersArr(Random.nextInt(ordersArr.length))
     //随机订单评分扣分
-    val ordersScoreRandom = Random.nextInt(11) + 1
+    val ordersScoreRandom = Random.nextInt(11) + 1 //Kotlin中的Random类的方法，表示生成一个0到10（不包含10）之间的随机整数。
     //随机用户ID
     val userID = arr1(Random.nextInt(arr1.length))
-    //下单时间
-    val ts = System.currentTimeMillis()
-    val timestamp = new Timestamp(ts)
-    val answerTime = sdf.format(new Date(ts))
+    //下单时间  将当前系统时间格式化为指定的日期格式，用于后续的业务处理和记录
+    val ts = System.currentTimeMillis() //获取当前系统时间的毫秒值，用于生成Timestamp对象和Date对象
+    val timestamp = new Timestamp(ts) //将当前系统时间的毫秒值转化为Timestamp对象，表示一个SQL TIMESTAMP类型的时间。
+    val answerTime = sdf.format(new Date(ts)) //将当前系统时间的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
 
     Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersRandom, ordersScoreRandom, answerTime, timestamp)
   }
-}
-//测试模拟数据
-def main(args: Array[String]): Unit = {
-  val printWriter = new PrintWriter(new File("output/order_info.json"))
-  val gson = new Gson()
-  for (i <- 1 to 2000) {
-    println(s"第{$i}条")
-    val jsonString = gson.toJson(genOrder())
-    println(jsonString)
-    //{"student_id":"学生ID_44","textbook_id":"教材ID_1","grade_id":"年级ID_4","subject_id":"科目ID_3_英语","chapter_id":"章节ID_chapter_3","question_id":"题目ID_701","score":10,"answer_time":"2020-01-11 17:20:42","ts":"Jan 11, 2020 5:20:42 PM"}
 
-    printWriter.write(jsonString + "\n")
-    //Thread.sleep(200)
+  //测试模拟数据
+  def main(args: Array[String]): Unit = {
+    val printWriter = new PrintWriter(new File("output/order_info.json"))
+    val gson = new Gson()
+    for (i <- 1 to 2000) {
+      println(s"第{$i}条")
+      val jsonString = gson.toJson(genOrder())
+      println(jsonString)
+      //{"user_id":"用户ID_44","app_id":"平台ID_1","city_id":"城市ID_4","restaurant_id":"餐厅ID_3_英语","food_category_id":"菜品ID_chapter_3","order_id":"题目ID_701","score":10,"answer_time":"2020-01-11 17:20:42","ts":"Jan 11, 2020 5:20:42 PM"}
+
+      printWriter.write(jsonString + "\n")
+      //Thread.sleep(200)
+    }
+    printWriter.flush() //将缓冲的输出数据刷新到目标输出流中，但并不关闭PrintWriter对象，可以继续进行输出操作
+    printWriter.close() //先调用flush()方法将缓冲区数据刷新到输出流中，然后关闭PrintWriter对象，关闭后不能再进行输出操作，如果再调用输出方法会抛出异常
   }
-  printWriter.flush()
-  printWriter.close()
 }
