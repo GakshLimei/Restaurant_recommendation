@@ -62,7 +62,7 @@ class KafkaProducerThread extends Thread{
   override def run(): Unit = {
     while (true){
       //模拟数据产生  通过Simulator.genQuestion()方法生成一个订单对象
-      val orders = Simulator.getQuestion()
+      val orders = Simulator.genOrder()
       //将产生的模拟数据转换成JSON 以JSON的格式存储在Kafka
       val jsonString = gson.toJson(orders)
       //使用KafkaProducer实例对象发送这个消息到名为“edu2”的主题中
