@@ -14,5 +14,4 @@ trait TDao {
   def insertBlackList(userid:String):Unit
   def insertUserAdCount(day:String,user:String,ad:String,count:Int):Unit
 
-
 }
