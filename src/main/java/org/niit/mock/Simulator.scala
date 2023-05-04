@@ -23,9 +23,9 @@ import scala.util.Random
 object Simulator {
   //模拟数据
   //用户ID
-  val arr1 = ArrayBuffer[String]()
+  val arr1 = ArrayBuffer[String]()   //初始化为一个空的 ArrayBuffer 类型的数组
   for (i <- 1 to 50) {
-    arr1 += "用户ID_" + i
+    arr1 += "用户ID_" + i   //将每个元素的值设置为字符串 "用户ID_" + i
   }
   //平台ID
   val arr2 = Array("平台ID_1", "平台ID_2")
