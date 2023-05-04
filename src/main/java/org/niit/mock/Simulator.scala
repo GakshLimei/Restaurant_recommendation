@@ -84,9 +84,9 @@ object Simulator {
     //下单时间  将当前系统时间格式化为指定的日期格式，用于后续的业务处理和记录
     val ts = System.currentTimeMillis() //获取当前系统时间的毫秒值，用于生成Timestamp对象和Date对象
     val timestamp = new Timestamp(ts) //将当前系统时间的毫秒值转化为Timestamp对象，表示一个SQL TIMESTAMP类型的时间。
-    val answerTime = sdf.format(new Date(ts)) //将当前系统时间的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
+    val orderTime = sdf.format(new Date(ts)) //将当前系统时间的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
 
-    Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersRandom, ordersScoreRandom, answerTime, timestamp)
+    Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersRandom, ordersScoreRandom, orderTime, timestamp)
   }
 
   //测试模拟数据
@@ -97,7 +97,7 @@ object Simulator {
       println(s"第{$i}条")
       val jsonString = gson.toJson(genOrder())
       println(jsonString)
-      //{"user_id":"用户ID_44","app_id":"平台ID_1","city_id":"城市ID_4","restaurant_id":"餐厅ID_3_英语","food_category_id":"菜品ID_chapter_3","order_id":"题目ID_701","score":10,"answer_time":"2020-01-11 17:20:42","ts":"Jan 11, 2020 5:20:42 PM"}
+      //{"user_id":"用户ID_44","app_id":"平台ID_1","city_id":"城市ID_4","restaurant_id":"餐厅ID_3","food_category_id":"菜品ID_category_3","order_id":"题目ID_701","score":10,"order_time":"2020-01-11 17:20:42","ts":"Jan 11, 2020 5:20:42 PM"}
 
       printWriter.write(jsonString + "\n")
       //Thread.sleep(200)
