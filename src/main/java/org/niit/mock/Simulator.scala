@@ -18,7 +18,7 @@ import scala.util.Random
  */
 
 /**
- * 在线教育学生学习数据模拟程序
+ * 外卖数据模拟程序
  */
 object Simulator {
   //模拟数据
