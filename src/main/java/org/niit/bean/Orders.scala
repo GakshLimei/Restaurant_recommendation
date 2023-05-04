@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 /**
  * @author: Gary Chen
- * @Created: 2023/5/4 11:43
+ * @Created: 2023/4/29 18:43
  * @desc: 订单信息样例类
  * @param user_id
  * @param app_id
