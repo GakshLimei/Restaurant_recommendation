@@ -13,6 +13,7 @@ object RecommendApp extends App with TApp{
   start("local[*]","recommend"){
     val recommendController = new RecommendController
     recommendController.dispatch()
+
   }
 
 }
