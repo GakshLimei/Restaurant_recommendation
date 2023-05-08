@@ -30,7 +30,7 @@ object ALSModeling {
     import spark.implicits._
 
     //2.加载数据并转换为：Dataset[Rating(用户id,订单id,推荐指数）]
-    val path = "output/orders_info.json"
+    val path = "output/order_info.json"
     val ordersInfoDF: Dataset[Rating] = spark.sparkContext.textFile(path)
       .map(parseOrdersInfo)
       .toDS()
@@ -107,11 +107,11 @@ object ALSModeling {
     val ordersID: Long = orders.order_id.split("_")(1).toLong
     val rating: Int = orders.score
 
-    //2.计算推荐指数:得分低的题目,推荐指数高
+    //2.计算推荐指数:得分高的订单,推荐指数高
     val ratingFix: Int =
-      if (rating >= 3) 3
-      else if (rating > 3 && rating <= 8) 2
-      else 1
+      if (rating >= 8) 3    //评分大于等于8的推荐指数为3
+      else if (rating < 8 && rating <= 3) 2   //评分3-8的推荐指数2
+      else 1    //其他的推荐指数为1
 
       //3.返回用户id，问题id,推荐指数
       Rating(userID, ordersID, ratingFix)
