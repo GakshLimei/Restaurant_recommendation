@@ -19,7 +19,7 @@ class RESDataService  {
       (data.food_category_id,1)
     })
     //
-    
+
 
   }
 
