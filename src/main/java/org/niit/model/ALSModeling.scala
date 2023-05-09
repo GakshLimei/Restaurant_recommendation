@@ -70,7 +70,7 @@ object ALSModeling {
     //显示测试集数据
     randomSplits(1).foreach(x => println("测试集： " + x))
     //推荐结果
-    recommend.foreach(x => println("学生ID：" + x(0) + " ,推荐题目 " + x(1)))
+    recommend.foreach(x => println("用户ID：" + x(0) + " ,推荐订单 " + x(1)))
     //打印预测结果
     predictions.foreach(x => println("预测结果:  " + x))
     //输出误差
@@ -85,6 +85,11 @@ object ALSModeling {
       val put: Put = new Put(Bytes.toBytes("als_model-recommended_question_id"))
       put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("path"), Bytes.toBytes(path))
       HBaseUtil.putData(put)
+      //调用 HBaseUtil 类的 setHTable 方法，将 HBase 表名 "bigdata:student" 设置为当前对象的 HTable。
+      //判断模型的 RMSE(均方根误差)是否小于等于 1.5。如果是，则执行下一步操作。
+      //生成一个保存模型的路径 path,格式为 "output/als_model/" + System.currentTimeMillis()。
+      //将模型保存到该路径下，并将保存后的文件名作为值，列族名为 "info",列名为 "path",列值为字节数组 path。
+      //调用 HBaseUtil 类的 putData 方法，将保存好的模型数据 put 存储到 HBase 表中。
 
       println("模型path信息已保存到HBase")
 

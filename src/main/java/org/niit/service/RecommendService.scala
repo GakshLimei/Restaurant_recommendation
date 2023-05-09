@@ -24,9 +24,10 @@ class RecommendService {
     orders.foreachRDD(rdd =>{
       //1.获取训练好的模型路径
       //如果是存在HBase中
-      HBaseUtil.setHTable("bigdata:takeaway")
-      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
-      val path = value(0)
+//      HBaseUtil.setHTable("bigdata:takeaway")
+//      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
+//      val path = value(0)
+      val path = "D:\\spark\\usr\\local\\spark\\Takeaway\\Restaurant_recommendation\\output\\als_model\\1683291533402"
 
       //2.加载模型
       val model = ALSModel.load(path)
