@@ -41,7 +41,7 @@ class RecommendService {
       val ordersDF = rdd.toDF()
       val userIdDF = ordersDF.select(id2Int('user_id) as "user_id")
 
-      //5.使用模型给用户推荐错题   推荐10道错题
+      //5.使用模型给用户推荐错题   推荐10道高质量订单
       val recommendDF = model.recommendForUserSubset(userIdDF,10)
       //false 显示的时候。将省略的信息也显示出来
       recommendDF.show(false)
