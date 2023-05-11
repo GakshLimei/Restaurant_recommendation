@@ -6,13 +6,6 @@ import org.slf4j.LoggerFactory
 
 import java.util.Properties
 import java.util.concurrent.{ArrayBlockingQueue, ThreadPoolExecutor, TimeUnit}
-
-/**
- * @author: Gary Chen
- * @Created: 2023/5/2 22:54
- * @desc: 生成模拟数据
- */
-
 /**
  * 使用线程池调度Kafka生产者发送任务,将数据实时发送到Kafka
  */

@@ -11,7 +11,7 @@ class RealTimeAnalyse {
     hotCuisineTop10(orders)
     hotCanteenTop2(orders)
     hotPlatformTop3(orders)
-
+Thread.sleep(20000)
   }
 
   //Top10前十个用户最喜欢的菜品（用户评分）
@@ -60,13 +60,13 @@ class RealTimeAnalyse {
       println(s"清晨餐厅下单总数: ${morningRDD.count()}")
       println("----------早上-餐厅下单量TOP20---------")
       earlyMorningRDD.take(20).foreach(println)
-      println(s"早上餐厅下单总数: ${morningRDD.count()}")
+      println(s"早上餐厅下单总数: ${earlyMorningRDD.count()}")
       println("----------中午-餐厅下单量TOP20---------")
       noonRDD.take(20).foreach(println)
-      println(s"中午餐厅下单总数: ${morningRDD.count()}")
+      println(s"中午餐厅下单总数: ${noonRDD.count()}")
       println("----------晚上-餐厅下单量TOP20---------")
       eveningRDD.take(20).foreach(println)
-      println(s"晚上餐厅下单总数: ${morningRDD.count()}")
+      println(s"晚上餐厅下单总数: ${eveningRDD.count()}")
     })
   }
 
