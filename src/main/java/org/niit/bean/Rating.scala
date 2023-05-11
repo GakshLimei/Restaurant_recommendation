@@ -8,6 +8,6 @@ package org.niit.bean
  */
 case class Rating(
                  user_id:Long,    //用户id
-                 orders_id:Long,  //订单id
+                 restaurant_id:Long,  //餐厅id
                  rating:Float  //推荐指数
                  )extends Serializable
