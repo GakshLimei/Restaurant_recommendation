@@ -11,7 +11,6 @@ class RealTimeAnalyse {
     hotCuisineTop10(orders)
     hotCanteenTop2(orders)
     hotPlatformTop3(orders)
-Thread.sleep(20000)
   }
 
   //Top10前十个用户最喜欢的菜品（用户评分）
