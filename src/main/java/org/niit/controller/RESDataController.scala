@@ -12,7 +12,7 @@ class RESDataController {
     val restaurantData=DataHandler.kafkaOrdersDatHandler("BD2","takeaway")
     resDataService.dataAnalysis(restaurantData)
 
-      DataHandler.startOrders()//等待kafka关闭采集
+      DataHandler.startAndAwait()//等待kafka关闭采集
   }
 
 }
