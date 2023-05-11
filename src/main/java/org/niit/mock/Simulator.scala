@@ -3,13 +3,14 @@ package org.niit.mock
 import com.google.gson.Gson
 import org.niit.bean.Orders
 import org.niit.mock.Simulator.genOrder
-
 import java.io.{File, PrintWriter}
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
 
 /**
  * @author: Gary Chen
@@ -20,6 +21,7 @@ import scala.util.Random
 /**
  * 外卖数据模拟程序
  */
+
 object Simulator {
   //模拟数据
   //用户ID
@@ -81,10 +83,22 @@ object Simulator {
     val ordersScoreRandom = Random.nextInt(11) + 1 //Kotlin中的Random类的方法，表示生成一个0到10（不包含10）之间的随机整数。
     //随机用户ID
     val userID = arr1(Random.nextInt(arr1.length))
+
     //下单时间  将当前系统时间格式化为指定的日期格式，用于后续的业务处理和记录
-    val ts = System.currentTimeMillis() //获取当前系统时间的毫秒值，用于生成Timestamp对象和Date对象
-    val timestamp = new Timestamp(ts) //将当前系统时间的毫秒值转化为Timestamp对象，表示一个SQL TIMESTAMP类型的时间。
-    val orderTime = sdf.format(new Date(ts)) //将当前系统时间的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
+    // 指定日期范围
+    val startDate = "2022-01-01"
+    val endDate = "2022-12-31"
+
+    // 生成随机时间
+    val random = new Random()
+    val start = sdf.parse(s"$startDate 00:00:00").getTime
+    val end = sdf.parse(s"$endDate 23:59:59").getTime
+
+    // 转化为毫秒值
+    val randomTS = new Timestamp(start + (random.nextDouble() * (end - start)).toLong).getTime
+    val timestamp = new Timestamp(randomTS) //将随机生成的时间的的毫秒值转化为Timestamp对象，表示一个SQL TIMESTAMP类型的时间。
+    val orderTime = sdf.format(new Date(randomTS)) //将随机生成的时间的的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
+
 
     Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersRandom, ordersScoreRandom, orderTime, timestamp)
   }
