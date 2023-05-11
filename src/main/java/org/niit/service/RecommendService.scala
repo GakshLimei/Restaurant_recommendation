@@ -44,18 +44,21 @@ class RecommendService {
       //5.使用模型给用户推荐餐厅  推荐10个高质量餐厅
       //调用协同过滤模型 model 的 recommendForUserSubset() 方法。
       // 该方法需要传入两个参数：一个包含用户ID的DataFrame，和一个整数类型的参数 numItems，表示要返回的每个用户的推荐项目数量。
-      val recommendDF = model.recommendForUserSubset(userIdDF,10)
+      val recommendDF = model.recommendForUserSubset(userIdDF,3)
       //false 显示的时候。将省略的信息也显示出来
       recommendDF.show(false)  //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
 
-      //6.处理推荐结果： 取出学生id和题目id，拼接成字符串：id1,id2
+      //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
       val recommendedDF = recommendDF.as[(Int,Array[(Int,Float)])].map(t =>{
         val userId:String = "用户ID_" + t._1
-        val ordersId = t._2.map("订单ID" + _._2).mkString(",")
-        (userId,ordersId)
+        val restaurantId = t._2.map("餐厅ID" + _._2).mkString(",")
+        (userId,restaurantId)
       }).toDF("user_id","recommendations")
+      //将 DataFrame 转换为 RDD
+      //将 RDD 转换回 DataFrame，并将 user_id 和 recommendations 列分别作为 DataFrame 的 user_id 和 recommendations 列
+      //将 RDD 转换为 DataFrame，并将 user_id 和 recommendations 列分别作为 DataFrame 的 user_id 和 recommendations 列
 
-      //7.将kafka中的answer 数据和recommendDF进行合并
+      //7.将kafka中的orders 数据和recommendDF进行合并
       val allInfoDF = ordersDF.join(recommendedDF,"user_id")
 
       //8.写入数据库
@@ -65,7 +68,7 @@ class RecommendService {
         .option("driver", "com.mysql.jdbc.Driver")
         .option("user", "root")
         .option("password", "Niit@123")
-        .option("dbtable", "edu") //写到edu表里面
+        .option("dbtable", "etakeaway") //写到edu表里面
         .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
         .save
     })
