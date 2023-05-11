@@ -47,7 +47,7 @@ object DataHandler {
   //对于每个从 Kafka 中读取到的消息，使用 Gson 库将其转换为 Orders 对象。
   //将转换后的 Orders 对象组成的 DStream 返回。
 
-  def startOrders(): Unit = {
+  def startAndAwait(): Unit = {
     ssc.start()
     ssc.awaitTermination()
   }
