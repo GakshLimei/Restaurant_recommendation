@@ -1,18 +1,18 @@
 package org.niit.controller
 
 import org.niit.handler.DataHandler
-import org.niit.service.{RESDataService, RecommendService}
+import org.niit.service.RESDataService
 
 class RESDataController {
 
   private val resDataService=new RESDataService()
-  private val resReccommendService=new RecommendService()
+
 
   def dispatch():Unit={
-    val restaurantData=DataHandler.kafkaOrdersDatHandler("BD2","res1")
-//    resDataService.
+    val restaurantData=DataHandler.kafkaOrdersDatHandler("BD2","takeaway")
+    resDataService.dataAnalysis(restaurantData)
 
-      DataHandler.startOrders()
+      DataHandler.startOrders()//等待kafka关闭采集
   }
 
 }

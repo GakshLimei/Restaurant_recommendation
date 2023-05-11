@@ -34,7 +34,7 @@ object Simulator {
   //城市ID
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6")
   //餐厅ID
-  val arr4 = Array("餐厅ID_1_", "餐厅ID_2_", "餐厅ID_3_", "餐厅ID_4_")
+  val arr4 = Array("餐厅ID_1_", "餐厅ID_2_", "餐厅ID_3_", "餐厅ID_4_","餐厅ID_5_","餐厅ID_6_","餐厅ID_7_","餐厅ID_8_","餐厅ID_9_","餐厅ID_10_")
   //菜品ID
   val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3")
 
@@ -96,8 +96,8 @@ object Simulator {
 
     // 转化为毫秒值
     val randomTS = new Timestamp(start + (random.nextDouble() * (end - start)).toLong).getTime
-    val timestamp = new Timestamp(randomTS) //将当前系统时间的毫秒值转化为Timestamp对象，表示一个SQL TIMESTAMP类型的时间。
-    val orderTime = sdf.format(new Date(randomTS)) //将当前系统时间的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
+    val timestamp = new Timestamp(randomTS) //将随机生成的时间的的毫秒值转化为Timestamp对象，表示一个SQL TIMESTAMP类型的时间。
+    val orderTime = sdf.format(new Date(randomTS)) //将随机生成的时间的的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
 
 
     Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersRandom, ordersScoreRandom, orderTime, timestamp)

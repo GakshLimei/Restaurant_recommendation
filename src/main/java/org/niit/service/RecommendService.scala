@@ -24,26 +24,29 @@ class RecommendService {
     orders.foreachRDD(rdd =>{
       //1.获取训练好的模型路径
       //如果是存在HBase中
-      HBaseUtil.setHTable("bigdata:takeaway")
-      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
-      val path = value(0)
+//      HBaseUtil.setHTable("bigdata:takeaway")
+//      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
+//      val path = value(0)
+      val path = "D:\\spark\\usr\\local\\spark\\Takeaway\\Restaurant_recommendation\\output\\als_model\\1683291533402"
 
       //2.加载模型
       val model = ALSModel.load(path)
 
-      //3.由于在ALS推荐算法只能存储纯数字东西（订单ID—32 =32）所以在后面使用模型的时候也需要将要读取的数据截取
+      //3.由于在ALS推荐算法只能存储纯数字东西（用户ID—32 =32）所以在后面使用模型的时候也需要将要读取的数据截取
       val id2Int = udf((user_id:String) =>{
-        user_id.split("_")(1).toInt
+        user_id.split("_")(1).toInt    //根据 _ 分割数组，分割后取第二个元素为id，并调用toInt将其转换为整数类型
       })
 
       //4.由于SparkMlib的模型只能加载sparkSQL 所以需要rdd--》dataFrame
-      val ordersDF = rdd.toDF()
-      val userIdDF = ordersDF.select(id2Int('user_id) as "user_id")
+      val ordersDF = rdd.toDF()   //将RDD转换为DataFrame，将其命名为 ordersDF
+      val userIdDF = ordersDF.select(id2Int('user_id) as "user_id")    //调用 select 方法并传入 id2Int('user_id) 表达式，以将 user_id 转换为整数类型,使用 as 关键字给新生成的列起个别名 user_id
 
-      //5.使用模型给用户推荐错题   推荐10道错题
+      //5.使用模型给用户推荐餐厅  推荐10个高质量餐厅
+      //调用协同过滤模型 model 的 recommendForUserSubset() 方法。
+      // 该方法需要传入两个参数：一个包含用户ID的DataFrame，和一个整数类型的参数 numItems，表示要返回的每个用户的推荐项目数量。
       val recommendDF = model.recommendForUserSubset(userIdDF,10)
       //false 显示的时候。将省略的信息也显示出来
-      recommendDF.show(false)
+      recommendDF.show(false)  //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
 
       //6.处理推荐结果： 取出学生id和题目id，拼接成字符串：id1,id2
       val recommendedDF = recommendDF.as[(Int,Array[(Int,Float)])].map(t =>{

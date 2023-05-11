@@ -23,6 +23,13 @@ object DataHandler {
     })
     adClickData
   }
+  //调用SparkUtil.takeSSC()方法创建一个Spark Streaming上下文对象ssc，用于接收实时数据流。
+  //定义一个名为kafkaAdDataHandler的方法，该方法接受两个参数：group和topic，分别表示Kafka消息队列的消费组和主题。
+  //在方法内部调用MyKafkaUtil.getKafkaStream(group,topic,ssc)方法，该方法返回一个InputDStream[ConsumerRecord[String,String]]类型的数据流对象kfData，
+  // 表示从Kafka中读取的原始数据. 使用map方法将kfData数据流转换成AdClickData类型的数据流adClickData。
+  // 在map函数中，对每条原始数据进行解析，并将解析后的数据封装成AdClickData对象，然后返回该对象。
+  //返回adClickData数据流对象。
+  //总的来说，这段代码的作用是从Kafka消息队列中读取广告点击数据，然后将数据转换为指定格式的数据流，以便后续进行实时分析和处理。
 
   def kafkaOrdersDatHandler(group:String,topic:String):DStream[Orders]={
     //从Kafka中获得广告数据
@@ -36,6 +43,9 @@ object DataHandler {
     })
     ordersData
   }
+  //使用 MyKafkaUtil.getKafkaStream 函数从 Kafka 中获取数据流（DStream）。
+  //对于每个从 Kafka 中读取到的消息，使用 Gson 库将其转换为 Orders 对象。
+  //将转换后的 Orders 对象组成的 DStream 返回。
 
   def startOrders(): Unit = {
     ssc.start()
