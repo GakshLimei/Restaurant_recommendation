@@ -15,7 +15,7 @@ class RecommendController {
   def dispatch(): Unit = {
     val ordered = DataHandler.kafkaOrdersDatHandler("BD2","takeaway")
     recommendService.dataAnalysis(ordered)
-    DataHandler.startOrders()
+    DataHandler.startAndAwait()
   }
 
 }
