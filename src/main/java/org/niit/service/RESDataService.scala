@@ -24,10 +24,9 @@ class RESDataService  {
     //
     val reduceData=mapDS.reduceByKey(_ + _)
 
-    //
-    //
+
     reduceData.foreachRDD(rdd=>{
-      //
+      //第一个下划线：(外卖菜品，3)     _2:次数 元组索引值是从1开始 默认是降序
       val sortRDD:RDD[(String,Int)] = rdd.sortBy(_._2,false)
       val top10:Array[(String,Int)] =sortRDD.take(10)
       println("------------统计Top10热门外卖菜品----------------")
