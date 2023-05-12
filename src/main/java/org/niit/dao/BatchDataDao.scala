@@ -6,6 +6,11 @@ import org.niit.util.SparkUtil
 
 import java.util.Properties
 
+/**
+ * @author: Gary Chen
+ * @Created: 2023/5/11 16:21
+ * @desc:
+ */
 class BatchDataDao {
 
   private val spark = SparkUtil.takeSpark()

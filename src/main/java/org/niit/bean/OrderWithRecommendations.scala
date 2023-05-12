@@ -3,7 +3,10 @@ package org.niit.bean
 import java.sql.Timestamp
 
 /**
- * 学生答题信息和推荐的题目ids样例类
+ * @author: Gary Chen
+ * @Created: 2023/5/11 16:21
+ * @desc:
+ * 用户订单信息和推荐的订单ids样例类
  */
 case class OrderWithRecommendations(
                                      user_id: String, //用户ID
@@ -14,5 +17,5 @@ case class OrderWithRecommendations(
                                      order_id: String, //订单ID
                                      score: Int, //用户评分
                                      order_time: String, //订单提交时间，yyyy-MM-dd HH:mm:ss字符串形式
-                                     ts: Timestamp //答题提交时间，时间戳形式
-                                    ) extends Serializable
+                                     ts: Timestamp //订单提交时间，时间戳形式
+                                   ) extends Serializable
