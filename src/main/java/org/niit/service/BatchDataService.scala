@@ -5,6 +5,11 @@ import org.niit.bean.OrderWithRecommendations
 import org.niit.dao.BatchDataDao
 import org.niit.util.SparkUtil
 
+/**
+ * @author: Gary Chen
+ * @Created: 2023/5/11 16:19
+ * @desc:
+ */
 //离线批处理服务
 class BatchDataService {
 
@@ -20,13 +25,13 @@ class BatchDataService {
     val takeawayDao = new BatchDataDao
     val allInfoDS = takeawayDao.getTakeawayData()
     //需求一：
-    hotSubjectCountTop50(allInfoDS)
+    hotrestaurantCountTop50(allInfoDS)
     //需求二：
-    hotSubjectRecommendTop20(allInfoDS)
+    hotrestaurantRecommendTop20(allInfoDS)
   }
 
-  //需求一：找到Top50热点题对应的科目，然后统计这些科目中，分别包含热点提的数量 DSL语法实现
-  def hotSubjectCountTop50(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  //需求一：找到Top50热点订单对应的餐厅，然后统计这些餐厅中，分别包含热点订单的数量 DSL语法实现
+  def hotrestaurantCountTop50(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
     //2.1统计前50道热点题 ----->>在数据库中，即使相同的题目，也是分布在不同行中的
     //张三  题目1  数学
     //李四  题目1  数学  =>题目1  2
@@ -51,7 +56,7 @@ class BatchDataService {
    语文   15
    英语   10
    */
-  def hotSubjectRecommendTop20(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  def hotrestaurantRecommendTop20(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
     //3.1统计前20道热点题，根据数量进行降序
     val hotTop20 = allInfoDS.groupBy('order_id)
       .agg(count("*") as "hot")
