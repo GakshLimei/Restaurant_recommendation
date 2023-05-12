@@ -60,15 +60,16 @@ class RecommendService {
 
       //7.将kafka中的orders 数据和recommendDF进行合并
       val allInfoDF = ordersDF.join(recommendedDF,"user_id")
+//      val dataFrame = allInfoDF.select("user_id","score ","recommendations")
 
       //8.写入数据库
       allInfoDF.write
         .format("jdbc")
-        .option("url", "jdbc:mysql://Node1:3306/BD2?useUnicode=true&characterEncoding=utf8")
+        .option("url", "jdbc:mysql://Node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8")
         .option("driver", "com.mysql.jdbc.Driver")
         .option("user", "root")
         .option("password", "Niit@123")
-        .option("dbtable", "takeaway") //写到edu表里面
+        .option("dbtable", "Recommend") //写到edu表里面
         .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
         .save
     })
