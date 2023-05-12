@@ -45,7 +45,7 @@ object ALSModeling {
       .setMaxIter(15)
       .setRegParam(0.09)
       .setUserCol("user_id")
-      .setItemCol("orders_id")
+      .setItemCol("restaurant_id")
       .setRatingCol("rating")
 
     //5.使用训练集进行训练

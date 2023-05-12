@@ -32,7 +32,7 @@ object DataHandler {
   //总的来说，这段代码的作用是从Kafka消息队列中读取广告点击数据，然后将数据转换为指定格式的数据流，以便后续进行实时分析和处理。
 
   def kafkaOrdersDatHandler(group:String,topic:String):DStream[Orders]={
-    //从Kafka中获得广告数据
+    //从Kafka中获得数据
     val kfDataDS:InputDStream[ConsumerRecord[String,String]] = MyKafkaUtil.getKafkaStream(group,topic, ssc)
     val ordersData:DStream[Orders] = kfDataDS.map(kafkaData =>{
       val data = kafkaData.value()

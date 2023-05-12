@@ -107,7 +107,7 @@ object Simulator {
   def main(args: Array[String]): Unit = {
     val printWriter = new PrintWriter(new File("output/order_info.json"))
     val gson = new Gson()
-    for (i <- 1 to 2000) {
+    for (i <- 1 to 300000) {
       println(s"第{$i}条")
       val jsonString = gson.toJson(genOrder())
       println(jsonString)
