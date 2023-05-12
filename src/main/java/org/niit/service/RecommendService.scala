@@ -68,7 +68,7 @@ class RecommendService {
         .option("driver", "com.mysql.jdbc.Driver")
         .option("user", "root")
         .option("password", "Niit@123")
-        .option("dbtable", "etakeaway") //写到edu表里面
+        .option("dbtable", "takeaway") //写到edu表里面
         .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
         .save
     })
