@@ -44,9 +44,9 @@ object ALSModeling {
       .setRank(20)
       .setMaxIter(15)
       .setRegParam(0.09)
-      .setUserCol("user_id")
-      .setItemCol("restaurant_id")
-      .setRatingCol("rating")
+      .setUserCol("user_id")//设置用户id是哪一列
+      .setItemCol("restaurant_id")//设置餐厅id是哪一列
+      .setRatingCol("rating")//设置评分列
 
     //5.使用训练集进行训练
     val model:ALSModel = als.fit(randomSplits(0)).setColdStartStrategy("drop")
@@ -105,11 +105,11 @@ object ALSModeling {
    * 将用户订单的详细信息转为Rating(用户id,订单id,推荐指数)
    */
   def parseOrdersInfo(json: String): Rating = {
-    //1.获取用户订单信息(用户id,订单id,推荐指数)
+    //1.获取用户订单信息(用户id,订单id,订单评分)
     val gson: Gson = new Gson()
     val orders: Orders = gson.fromJson(json, classOf[Orders])
     val userID: Long = orders.user_id.split("_")(1).toLong
-    val ordersID: Long = orders.order_id.split("_")(1).toLong
+    val restaurantID: Long = orders.restaurant_id.split("_")(1).toLong
     val rating: Int = orders.score
 
     //2.计算推荐指数:得分高的订单,推荐指数高
@@ -119,7 +119,7 @@ object ALSModeling {
       else 1    //其他的推荐指数为1
 
       //3.返回用户id，问题id,推荐指数
-      Rating(userID, ordersID, ratingFix)
+      Rating(userID, restaurantID, ratingFix)
   }
 
 }
