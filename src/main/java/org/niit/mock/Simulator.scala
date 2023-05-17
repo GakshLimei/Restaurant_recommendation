@@ -34,27 +34,33 @@ object Simulator {
   //城市ID
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6","城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
   //餐厅ID
-  val arr4 = Array("餐厅ID_1", "餐厅ID_2", "餐厅ID_3", "餐厅ID_4","餐厅ID_5","餐厅ID_6","餐厅ID_7","餐厅ID_8","餐厅ID_9","餐厅ID_10")
+//  val arr4 = Array("餐厅ID_1", "餐厅ID_2", "餐厅ID_3", "餐厅ID_4","餐厅ID_5","餐厅ID_6","餐厅ID_7","餐厅ID_8","餐厅ID_9","餐厅ID_10")
   //菜品ID
   val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3","菜品ID_category_4", "菜品ID_category_5", "菜品ID_category_6","菜品ID_category_7", "菜品ID_category_8", "菜品ID_category_9","菜品ID_category_10")
 
   //订单ID与平台、城市、餐厅、菜品的对应关系,
   val ordersMap = collection.mutable.HashMap[String, ArrayBuffer[String]]()
+  val restaurantMap = collection.mutable.HashMap[String, ArrayBuffer[String]]()
 
   var ordersID = 1
-  for (appID <- arr2; cityID <- arr3; restaurantID <- arr4; food_categoryID <- arr5) {
+  var restaurantID = 1
+    for (appID <- arr2; cityID <- arr3; food_categoryID <- arr5) {
     val key = new StringBuilder()
       .append(appID).append("^")
       .append(cityID).append("^")
-      .append(restaurantID).append("^")
+//      .append(restaurantID).append("^")
       .append(food_categoryID)
 
     val ordersArr = ArrayBuffer[String]()
+    val restaurantArr = ArrayBuffer[String]()
     for (i <- 1 to 20) {
       ordersArr += "订单ID_" + ordersID
+      restaurantArr += "餐厅ID_"+ restaurantID
       ordersID += 1
+      restaurantID+=1
     }
     ordersMap.put(key.toString(), ordersArr)
+      restaurantMap.put(key.toString(),restaurantArr)
   }
   val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
@@ -65,20 +71,24 @@ object Simulator {
     //随机城市ID
     val cityIDRandom = arr3(Random.nextInt(arr3.length))
     //随机餐厅ID
-    val restaurantIDRandom = arr4(Random.nextInt(arr4.length))
+//    val restaurantIDRandom = arr4(Random.nextInt(arr4.length))
     //随机菜品ID
     val food_categoryIDRandom = arr5(Random.nextInt(arr5.length))
 
     val key = new StringBuilder()
       .append(appIDRandom).append("^")
       .append(cityIDRandom).append("^")
-      .append(restaurantIDRandom).append("^")
+//      .append(restaurantIDRandom).append("^")
       .append(food_categoryIDRandom)
 
     //取出订单
     val ordersArr = ordersMap(key.toString())
+    //取出餐厅
+    val restaurantArr = restaurantMap(key.toString())
     //随机订单ID
-    val ordersRandom = ordersArr(Random.nextInt(ordersArr.length))
+    val ordersIDRandom = ordersArr(Random.nextInt(ordersArr.length))
+    //随机餐厅
+    val restaurantIDRandom = restaurantArr(Random.nextInt(restaurantArr.length))
     //随机订单评分扣分
     val ordersScoreRandom = Random.nextInt(11) + 1 //Kotlin中的Random类的方法，表示生成一个0到10（不包含10）之间的随机整数。
     //随机用户ID
@@ -100,7 +110,7 @@ object Simulator {
     val orderTime = sdf.format(new Date(randomTS)) //将随机生成的时间的的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
 
 
-    Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersRandom, ordersScoreRandom, orderTime, timestamp)
+    Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersIDRandom, ordersScoreRandom, orderTime, timestamp)
   }
 
   //测试模拟数据
