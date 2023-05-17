@@ -34,7 +34,7 @@ object Simulator {
   //城市ID
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6","城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
   //餐厅ID
-  val arr4 = Array("餐厅ID_1_", "餐厅ID_2_", "餐厅ID_3_", "餐厅ID_4_","餐厅ID_5_","餐厅ID_6_","餐厅ID_7_","餐厅ID_8_","餐厅ID_9_","餐厅ID_10_")
+  val arr4 = Array("餐厅ID_1", "餐厅ID_2", "餐厅ID_3", "餐厅ID_4","餐厅ID_5","餐厅ID_6","餐厅ID_7","餐厅ID_8","餐厅ID_9","餐厅ID_10")
   //菜品ID
   val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3","菜品ID_category_4", "菜品ID_category_5", "菜品ID_category_6","菜品ID_category_7", "菜品ID_category_8", "菜品ID_category_9","菜品ID_category_10")
 
