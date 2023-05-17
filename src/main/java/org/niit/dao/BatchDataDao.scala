@@ -22,8 +22,8 @@ class BatchDataDao {
     props.setProperty("user", "root")
     props.setProperty("password", "Niit@123")
     val allInfoDS: Dataset[OrderWithRecommendations] = spark.read.jdbc(
-      "jdbc:mysql://node1:3306/BD2?useUnicode=true&characterEncoding=utf8",
-      "takeaway",
+      "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
+      "Recommend",
       props
     ).as[OrderWithRecommendations]
     //返回值
