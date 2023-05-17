@@ -27,7 +27,7 @@ class RecommendService {
 //      HBaseUtil.setHTable("bigdata:takeaway")
 //      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
 //      val path = value(0)
-      val path = "D:\\spark\\usr\\local\\spark\\Takeaway\\Restaurant_recommendation\\output\\als_model\\1683291533402"
+      val path = "output/als_model/1684301298418"
 
       //2.加载模型
       val model = ALSModel.load(path)
@@ -51,7 +51,7 @@ class RecommendService {
       //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
       val recommendedDF = recommendDF.as[(Int,Array[(Int,Float)])].map(t =>{
         val userId:String = "用户ID_" + t._1
-        val restaurantId = t._2.map("餐厅ID" + _._2).mkString(",")
+        val restaurantId = t._2.map("餐厅ID_" + _._1).mkString(",")
         (userId,restaurantId)
       }).toDF("user_id","recommendations")
       //将 DataFrame 转换为 RDD
