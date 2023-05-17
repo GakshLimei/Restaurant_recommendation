@@ -6,7 +6,7 @@ import org.niit.service.BatchDataService
 /**
  * @author: Gary Chen
  * @Created: 2023/5/11 11:02
- * @desc:
+ * @desc:离线分析控制层
  */
 class BatchDataAppController {
   //  离线分析
