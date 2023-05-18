@@ -27,7 +27,7 @@ class RecommendService {
 //      HBaseUtil.setHTable("bigdata:takeaway")
 //      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
 //      val path = value(0)
-      val path = "output/als_model/1684304958773"
+      val path = "D:\\spark\\usr\\local\\spark\\Takeaway\\Restaurant_recommendation\\output\\als_model\\1684377130630"
 
       //2.加载模型
       val model = ALSModel.load(path)
@@ -59,7 +59,7 @@ class RecommendService {
       //将 RDD 转换为 DataFrame，并将 user_id 和 recommendations 列分别作为 DataFrame 的 user_id 和 recommendations 列
 
       //7.将kafka中的orders 数据和recommendDF进行合并
-      val allInfoDF = ordersDF.join(recommendedDF,"user_id")
+      val allInfoDF = ordersDF.join(recommendedDF,"user_id").select("user_id","restaurant_id")
 //      val dataFrame = allInfoDF.select("user_id","score ","recommendations")
 
       //8.写入数据库
@@ -69,7 +69,7 @@ class RecommendService {
         .option("driver", "com.mysql.jdbc.Driver")
         .option("user", "root")
         .option("password", "Niit@123")
-        .option("dbtable", "Recommend") //写到edu表里面
+        .option("dbtable", "Recommend_test") //写到edu表里面
         .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
         .save
     })
