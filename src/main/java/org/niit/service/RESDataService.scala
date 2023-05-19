@@ -11,6 +11,7 @@ class RESDataService  {
 
     popularDishesTop10(top)
     takeawaySalesCitiesTop10(top)
+    popularRestaurantsTop3(top)
 
   }
 
@@ -53,5 +54,25 @@ class RESDataService  {
       top10.foreach(println)
     })
   }
+
+
+  //热门餐厅Top3
+
+  private def popularRestaurantsTop3(top:DStream[Orders]):Unit={
+
+    val mapDS=top.map(data=>{
+      (data.restaurant_id,1)
+    })
+
+    val reduceData=mapDS.reduceByKey(_ + _)
+
+    reduceData.foreachRDD(rdd=>{
+      val sortRDD=rdd.sortBy(_._2,false)
+      val top3=sortRDD.take(3)
+      println("------------热门餐厅Top3------------------")
+      top3.foreach(println)
+    })
+  }
+
 
 }
