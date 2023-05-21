@@ -125,7 +125,6 @@ class RealTimeAnalyse {
       val countResult: DataFrame = orderStatsDF.groupBy($"restaurant_id").count()
       // 将结果输出到 MySQL 数据库中
 
-
       countResult.write
         .format("jdbc")
         .option("url", "jdbc:mysql://localhost:3306/takeaway?useUnicode=true&characterEncoding=utf8")
