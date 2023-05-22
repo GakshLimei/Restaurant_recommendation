@@ -133,7 +133,6 @@ class RealTimeAnalyse {
         .option("dbtable", "hotCanteenTop2") //写到edu表里面
         .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
         .save
-
     })
   }
 
