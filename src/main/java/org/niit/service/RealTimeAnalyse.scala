@@ -41,6 +41,8 @@ class RealTimeAnalyse {
         setProperty("user", user)
         setProperty("password", password)
       }})
+
+
     })
   }
 
