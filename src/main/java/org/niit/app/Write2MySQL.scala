@@ -8,6 +8,7 @@ import org.niit.controller.Write2MySQLController
  *
  * @Author : Gary Chen
  * @create 2023/5/25 11:41
+ * @desc: 将Kafka中的数据存入MySQL
  */
 object Write2MySQL extends App with TApp {
   start("local[*]", "Writetomysql") {
