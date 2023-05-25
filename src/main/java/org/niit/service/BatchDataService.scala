@@ -3,7 +3,10 @@ package org.niit.service
 import org.apache.spark.sql.Dataset
 import org.niit.bean.OrderWithRecommendations
 import org.niit.dao.BatchDataDao
+import org.apache.spark.sql.SaveMode
 import org.niit.util.SparkUtil
+
+import java.util.Properties
 
 /**
  * @author: Gary Chen
@@ -14,6 +17,11 @@ import org.niit.util.SparkUtil
 class BatchDataService {
 
   val spark = SparkUtil.takeSpark()
+  val dbProperties = new Properties()
+  dbProperties.put("user", "root")
+  dbProperties.put("password", "Niit@123")
+  dbProperties.put("driver", "com.mysql.jdbc.Driver")
+
 
   import org.apache.spark.sql.functions._
   import spark.implicits._
@@ -30,7 +38,7 @@ class BatchDataService {
     //需求二：
     hotfoodcategoryRecommendTop10(allInfoDS)
     //需求三：
-//    hotfoodcategoryTop10(allInfoDS)
+//    hotfoodcategoryTop3(allInfoDS)
     //需求四：
 //    hotrestaurantTop10(allInfoDS)
   }
@@ -53,6 +61,9 @@ class BatchDataService {
       .agg(count("*") as "hotCount")
       .orderBy('hotCount.desc)
     println("--------统计推荐所属的热门城市Top10--------")
+    res.toDF().write.mode(SaveMode.Overwrite)
+      .jdbc("jdbc:mysql://Node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
+        "Batch_Hot_City_Top10", dbProperties)
     res.show()
   }
 
@@ -85,23 +96,32 @@ class BatchDataService {
 //    ridsDS.show(false)
     //3.4将 ridsDS 和 allInfoDS进行关联，得到每个推荐餐厅所属的菜品
     val ridAndSid = ridsDS.join(allInfoDS.dropDuplicates("restaurant_id"), "restaurant_id")
-    ridAndSid.show(false)
+    ridAndSid.write.mode(SaveMode.Overwrite)
+      .jdbc("jdbc:mysql://Node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
+        "Batch_Hot_Food_Top10", dbProperties)
+
     //3.5统计各个科目包含的推荐题目数量，并降序排序
     val res = ridAndSid.groupBy('restaurant_id)
       .agg(count("recommendations") as "rcount")
       .orderBy('rcount.desc)
     //3.6输出
     println("---------每个热门食品类别推荐前十个餐厅------------")
+    res.toDF().write.mode(SaveMode.Overwrite)
+      .jdbc("jdbc:mysql://Node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
+        "Batch_Hot_Canteen_Top10", dbProperties)
     res.show(10)
   }
 
   //需求三：统计热门菜品Top10
-  def hotfoodcategoryTop10(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  def hotfoodcategoryTop3(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
     val foodhotTop10 = allInfoDS.groupBy('food_category_id)
       .agg(count("*")as 'hot)
       .orderBy('hot.desc)
     println("---------统计热门菜品Top10------------")
-    foodhotTop10.show()
+    foodhotTop10.toDF().write.mode(SaveMode.Overwrite)
+      .jdbc("jdbc:mysql://Node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
+        "Batch_Hot_Food_Top10", dbProperties)
+    foodhotTop10.show(3)
   }
 
   //需求四：热门餐厅
@@ -110,6 +130,9 @@ class BatchDataService {
       .agg(count("*") as 'hot)
       .orderBy('hot.desc)
     println("---------统计热门餐厅Top10------------")
+    hotrestaurantTop10.toDF().write.mode(SaveMode.Overwrite)
+      .jdbc("jdbc:mysql://Node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
+        "Batch_Hot_Canteen_Top10", dbProperties)
     hotrestaurantTop10.show(10)
   }
 }
