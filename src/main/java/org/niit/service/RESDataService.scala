@@ -48,7 +48,7 @@ class RESDataService  {
       val user = "root"
       val password = "root"
 
-      resultDF.write.mode(SaveMode.Append).jdbc(url, "categoryTop10", new java.util.Properties() {
+      resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "categoryTop10", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.cj.jdbc.Driver")
           setProperty("user", user)
@@ -94,7 +94,7 @@ class RESDataService  {
       val user = "root"
       val password = "root"
 
-      resultDF.write.mode(SaveMode.Append).jdbc(url, "citiesTop10", new java.util.Properties() {
+      resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "citiesTop10", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.cj.jdbc.Driver")
           setProperty("user", user)
@@ -135,13 +135,15 @@ class RESDataService  {
       val user = "root"
       val password = "root"
 
-      resultDF.write.mode(SaveMode.Append).jdbc(url, "restaurantsTop5", new java.util.Properties() {
+      resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "restaurantsTop5", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.cj.jdbc.Driver")
           setProperty("user", user)
           setProperty("password", password)
         }
       })
+
+
 
 
     })
