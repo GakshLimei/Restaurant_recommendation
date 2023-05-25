@@ -12,8 +12,10 @@ import org.niit.util.SparkUtil
  * @create 2023/5/25 11:55
  */
 class Write2MySQLService() {
-      val spark = SparkUtil.takeSpark()
-      import spark.implicits._
+  val spark = SparkUtil.takeSpark()
+
+  import spark.implicits._
+
   def writetomysql(orders: DStream[Orders]): Unit = {
     orders.foreachRDD(rdd => {
 

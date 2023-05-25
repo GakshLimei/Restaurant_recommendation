@@ -9,8 +9,8 @@ import org.niit.service.Write2MySQLService
  * @Author : Gary Chen
  * @create 2023/5/25 11:53
  */
-class WriteToController {
-  private val write2mysql= new Write2MySQLService()
+class Write2MySQLController {
+  private val write2mysql = new Write2MySQLService()
 
   def dispatch(): Unit = {
     val orderData = DataHandler.kafkaOrdersDatHandler("BD2", "takeaway")
