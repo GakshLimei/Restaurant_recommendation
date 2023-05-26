@@ -5,14 +5,14 @@ import org.niit.service.RESDataService
 
 class RESDataController {
 
-  private val resDataService=new RESDataService()
+  private val resDataService = new RESDataService()
 
 
-  def dispatch():Unit={
-    val restaurantData=DataHandler.kafkaOrdersDatHandler("BD2","takeaway")
+  def dispatch(): Unit = {
+    val restaurantData = DataHandler.kafkaOrdersDatHandler("BD2", "takeaway")
     resDataService.dataAnalysis(restaurantData)
 
-      DataHandler.startAndAwait()//等待kafka关闭采集
+    DataHandler.startAndAwait() //等待kafka关闭采集
   }
 
 }
