@@ -181,7 +181,7 @@ class BatchDataService {
 
     val allInfoDF = ordersDF.join(userRecsDF,"user_id").select("user_id","recommendations")
     // 将推荐结果存储到 MySQL 中
-    val rectable = "recommendations_for_user"
+    val rectable = "Batch_recommendations_for_user"
     allInfoDF.write.mode(SaveMode.Append)
      .jdbc(url,rectable,dbProperties)
 
@@ -215,10 +215,10 @@ class BatchDataService {
 
     val allInfoDF1 = ordersDF.join(userRecsDF, "restaurant_id").select("restaurant_id", "recommendations")
     // 将推荐结果存储到 MySQL 中
-    val rectable = "recommendations_for_restaurant"
+    val rectable = "Batch_recommendations_for_restaurant"
     allInfoDF1.write.mode(SaveMode.Append)
       .jdbc(url,rectable,dbProperties)
 
   }
-//  conn.close()
+
 }
