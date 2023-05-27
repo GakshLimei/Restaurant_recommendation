@@ -24,7 +24,7 @@ object Simulator {
   //模拟数据
   //用户ID
   val arr1 = ArrayBuffer[String]() //初始化为一个空的 ArrayBuffer 类型的数组
-  for (i <- 1 to 50) {
+  for (i <- 1 to 2000) {
     arr1 += "用户ID_" + i //将每个元素的值设置为字符串 "用户ID_" + i
   }
   //平台ID
@@ -33,7 +33,7 @@ object Simulator {
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6", "城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
   //餐厅ID
   val arr4 = ArrayBuffer[String]() //初始化为一个空的 ArrayBuffer 类型的数组
-  for (i <- 1 to 100) {
+  for (i <- 1 to 1000) {
     arr4 += "餐厅ID_" + i //将每个元素的值设置为字符串 "餐厅ID_" + i
   }
   //菜品ID
