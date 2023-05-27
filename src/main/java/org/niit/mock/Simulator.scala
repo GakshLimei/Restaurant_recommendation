@@ -2,15 +2,13 @@ package org.niit.mock
 
 import com.google.gson.Gson
 import org.niit.bean.Orders
-import org.niit.mock.Simulator.genOrder
+
 import java.io.{File, PrintWriter}
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-import java.sql.Timestamp
-import java.text.SimpleDateFormat
 
 /**
  * @author: Gary Chen
@@ -25,45 +23,63 @@ import java.text.SimpleDateFormat
 object Simulator {
   //模拟数据
   //用户ID
-  val arr1 = ArrayBuffer[String]()   //初始化为一个空的 ArrayBuffer 类型的数组
+  val arr1 = ArrayBuffer[String]() //初始化为一个空的 ArrayBuffer 类型的数组
   for (i <- 1 to 50) {
-    arr1 += "用户ID_" + i   //将每个元素的值设置为字符串 "用户ID_" + i
+    arr1 += "用户ID_" + i //将每个元素的值设置为字符串 "用户ID_" + i
   }
   //平台ID
   val arr2 = Array("平台ID_1", "平台ID_2")
   //城市ID
-  val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6","城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
+  val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6", "城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
   //餐厅ID
-//  val arr4 = Array("餐厅ID_1", "餐厅ID_2", "餐厅ID_3", "餐厅ID_4","餐厅ID_5","餐厅ID_6","餐厅ID_7","餐厅ID_8","餐厅ID_9","餐厅ID_10")
+  val arr4 = ArrayBuffer[String]() //初始化为一个空的 ArrayBuffer 类型的数组
+  for (i <- 1 to 100) {
+    arr4 += "餐厅ID_" + i //将每个元素的值设置为字符串 "餐厅ID_" + i
+  }
   //菜品ID
-  val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3","菜品ID_category_4", "菜品ID_category_5", "菜品ID_category_6","菜品ID_category_7", "菜品ID_category_8", "菜品ID_category_9","菜品ID_category_10")
+  val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3", "菜品ID_category_4", "菜品ID_category_5", "菜品ID_category_6", "菜品ID_category_7", "菜品ID_category_8", "菜品ID_category_9", "菜品ID_category_10")
 
   //订单ID与平台、城市、餐厅、菜品的对应关系,
   val ordersMap = collection.mutable.HashMap[String, ArrayBuffer[String]]()
   val restaurantMap = collection.mutable.HashMap[String, ArrayBuffer[String]]()
-
+  val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
   var ordersID = 1
-  var restaurantID = 1
-    for (appID <- arr2; cityID <- arr3; food_categoryID <- arr5) {
+  for (appID <- arr2; cityID <- arr3; restaurantID <- arr4; food_categoryID <- arr5) {
     val key = new StringBuilder()
       .append(appID).append("^")
       .append(cityID).append("^")
-//      .append(restaurantID).append("^")
+      .append(restaurantID).append("^")
       .append(food_categoryID)
 
     val ordersArr = ArrayBuffer[String]()
     val restaurantArr = ArrayBuffer[String]()
     for (i <- 1 to 20) {
       ordersArr += "订单ID_" + ordersID
-      restaurantArr += "餐厅ID_"+ restaurantID
+
       ordersID += 1
-      restaurantID+=1
+
     }
     ordersMap.put(key.toString(), ordersArr)
-      restaurantMap.put(key.toString(),restaurantArr)
+    restaurantMap.put(key.toString(), restaurantArr)
   }
-  val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  var restaurantID = 1
 
+  //测试模拟数据
+  def main(args: Array[String]): Unit = {
+    val printWriter = new PrintWriter(new File("output/order_info.json"))
+    val gson = new Gson()
+    for (i <- 1 to 300000) {
+      println(s"第{$i}条")
+      val jsonString = gson.toJson(genOrder())
+      println(jsonString)
+      //{"user_id":"用户ID_44","app_id":"平台ID_1","city_id":"城市ID_4","restaurant_id":"餐厅ID_3","food_category_id":"菜品ID_category_3","order_id":"题目ID_701","score":10,"order_time":"2020-01-11 17:20:42","ts":"Jan 11, 2020 5:20:42 PM"}
+
+      printWriter.write(jsonString + "\n")
+      //Thread.sleep(200)
+    }
+    printWriter.flush() //将缓冲的输出数据刷新到目标输出流中，但并不关闭PrintWriter对象，可以继续进行输出操作
+    printWriter.close() //先调用flush()方法将缓冲区数据刷新到输出流中，然后关闭PrintWriter对象，关闭后不能再进行输出操作，如果再调用输出方法会抛出异常
+  }
 
   def genOrder() = {
     //随机平台ID
@@ -71,24 +87,20 @@ object Simulator {
     //随机城市ID
     val cityIDRandom = arr3(Random.nextInt(arr3.length))
     //随机餐厅ID
-//    val restaurantIDRandom = arr4(Random.nextInt(arr4.length))
+    val restaurantIDRandom = arr4(Random.nextInt(arr4.length))
     //随机菜品ID
     val food_categoryIDRandom = arr5(Random.nextInt(arr5.length))
 
     val key = new StringBuilder()
       .append(appIDRandom).append("^")
       .append(cityIDRandom).append("^")
-//      .append(restaurantIDRandom).append("^")
+      .append(restaurantIDRandom).append("^")
       .append(food_categoryIDRandom)
 
     //取出订单
     val ordersArr = ordersMap(key.toString())
-    //取出餐厅
-    val restaurantArr = restaurantMap(key.toString())
     //随机订单ID
     val ordersIDRandom = ordersArr(Random.nextInt(ordersArr.length))
-    //随机餐厅
-    val restaurantIDRandom = restaurantArr(Random.nextInt(restaurantArr.length))
     //随机订单评分扣分
     val ordersScoreRandom = Random.nextInt(11) + 1 //Kotlin中的Random类的方法，表示生成一个0到10（不包含10）之间的随机整数。
     //随机用户ID
@@ -111,22 +123,5 @@ object Simulator {
 
 
     Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersIDRandom, ordersScoreRandom, orderTime, timestamp)
-  }
-
-  //测试模拟数据
-  def main(args: Array[String]): Unit = {
-    val printWriter = new PrintWriter(new File("output/order_info.json"))
-    val gson = new Gson()
-    for (i <- 1 to 300000) {
-      println(s"第{$i}条")
-      val jsonString = gson.toJson(genOrder())
-      println(jsonString)
-      //{"user_id":"用户ID_44","app_id":"平台ID_1","city_id":"城市ID_4","restaurant_id":"餐厅ID_3","food_category_id":"菜品ID_category_3","order_id":"题目ID_701","score":10,"order_time":"2020-01-11 17:20:42","ts":"Jan 11, 2020 5:20:42 PM"}
-
-      printWriter.write(jsonString + "\n")
-      //Thread.sleep(200)
-    }
-    printWriter.flush() //将缓冲的输出数据刷新到目标输出流中，但并不关闭PrintWriter对象，可以继续进行输出操作
-    printWriter.close() //先调用flush()方法将缓冲区数据刷新到输出流中，然后关闭PrintWriter对象，关闭后不能再进行输出操作，如果再调用输出方法会抛出异常
   }
 }
