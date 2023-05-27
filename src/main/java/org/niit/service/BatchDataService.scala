@@ -17,9 +17,6 @@ import java.util.Properties
 class BatchDataService {
 
   val spark = SparkUtil.takeSpark()
-  // 使用conn进行数据库操作
-//  val conn = JDBCUtil.getConnection
-
   val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
   val dbProperties = new Properties()
   dbProperties.setProperty("user", "root")
@@ -29,19 +26,6 @@ class BatchDataService {
   import org.apache.spark.sql.functions._
   import spark.implicits._
 
-
-  def recommendService(): Unit = {
-    //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
-    //1.连接数据库
-    val path = "output/batch_als_order_model/1685154893368"
-    val takeawayDao1 = new BatchDataDao1
-    val allInfoDS = takeawayDao1.getTakeawayData()
-    allInfoDS.show()
-    //离线推荐一：根据用户推荐10个餐厅
-    recommendForAllUsers(allInfoDS, path)
-    //离线推荐二：根据餐厅推荐3个用户
-    recommendForAllItems(allInfoDS,path)
-  }
   def dataAnalysis(): Unit = {
     //离线分析，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
     //1.连接数据库
@@ -57,7 +41,19 @@ class BatchDataService {
     //需求四：
     hotrestaurantTop10(allInfoDS)
   }
-
+  def recommendService(): Unit = {
+    //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
+    //模型路径
+    val path = "output/batch_als_order_model/1685157225248"
+    //1.连接数据库
+    val takeawayDao1 = new BatchDataDao1
+    val allInfoDS = takeawayDao1.getTakeawayData()
+    allInfoDS.show()
+    //离线推荐一：根据用户推荐10个餐厅
+    recommendForAllUsers(allInfoDS, path)
+    //离线推荐二：根据餐厅推荐3个用户
+    recommendForAllItems(allInfoDS, path)
+  }
   def hotCityCountTop10(allInfoDS: Dataset[Orders]): Unit = {
     //2.1统计前50道热点题 ----->>在数据库中，即使相同的题目，也是分布在不同行中的
     val hotTop50 = allInfoDS.groupBy("order_id")
@@ -181,7 +177,7 @@ class BatchDataService {
     val allInfoDF = ordersDF.join(userRecsDF,"user_id").select("user_id","recommendations")
     // 将推荐结果存储到 MySQL 中
     val rectable = "Batch_recommendations_for_user"
-    allInfoDF.write.mode(SaveMode.Append)
+    allInfoDF.write.mode(SaveMode.Overwrite)
      .jdbc(url,rectable,dbProperties)
 
 
@@ -215,7 +211,7 @@ class BatchDataService {
     val allInfoDF1 = ordersDF.join(userRecsDF, "restaurant_id").select("restaurant_id", "recommendations")
     // 将推荐结果存储到 MySQL 中
     val rectable = "Batch_recommendations_for_restaurant"
-    allInfoDF1.write.mode(SaveMode.Append)
+    allInfoDF1.write.mode(SaveMode.Overwrite)
       .jdbc(url,rectable,dbProperties)
 
   }
