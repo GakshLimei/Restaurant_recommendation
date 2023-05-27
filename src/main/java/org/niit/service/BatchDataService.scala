@@ -33,7 +33,7 @@ class BatchDataService {
   def recommendService(): Unit = {
     //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
     //1.连接数据库
-    val path = "output/als_movie_model_test/1684896788168"
+    val path = "output/batch_als_order_model/1685154893368"
     val takeawayDao1 = new BatchDataDao1
     val allInfoDS = takeawayDao1.getTakeawayData()
     allInfoDS.show()
@@ -46,22 +46,20 @@ class BatchDataService {
     //离线分析，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
     //1.连接数据库
     //应该放在dao层
-    val takeawayDao = new BatchDataDao
-    val allInfoDS = takeawayDao.getTakeawayData()
+    val takeawayDao1 = new BatchDataDao1
+    val allInfoDS = takeawayDao1.getTakeawayData()
     //需求一：
     hotCityCountTop10(allInfoDS)
     //需求二：
-    hotfoodcategoryRecommendTop10(allInfoDS)
+//    hotfoodcategoryRecommendTop10(allInfoDS)
     //需求三：
-    hotfoodcategoryTop3(allInfoDS)
+    hotFoodCategoryTop3(allInfoDS)
     //需求四：
     hotrestaurantTop10(allInfoDS)
   }
 
-  def hotCityCountTop10(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  def hotCityCountTop10(allInfoDS: Dataset[Orders]): Unit = {
     //2.1统计前50道热点题 ----->>在数据库中，即使相同的题目，也是分布在不同行中的
-    //张三  题目1  数学
-    //李四  题目1  数学  =>题目1  2
     val hotTop50 = allInfoDS.groupBy("order_id")
       .agg(count("*") as "hotCount")
       .orderBy('hotCount.desc)
@@ -72,7 +70,7 @@ class BatchDataService {
     val res = joinDF.groupBy("city_id")
       .agg(count("*") as "hotCount")
       .orderBy('hotCount.desc)
-    println("--------统计推荐所属的热门城市Top10--------")
+    println("---------离线统计热门城市Top10---------")
     res.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Hot_City_Top10", dbProperties)
     res.show()
@@ -83,7 +81,7 @@ class BatchDataService {
    找到前20热点订单对应的推荐餐厅，然后找到推荐餐厅对应的用户，并统计每个用户分别包含推荐餐厅数量
 
    */
-  def hotfoodcategoryRecommendTop10(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  def hotfoodcategoryRecommendTop10(allInfoDS: Dataset[Orders]): Unit = {
 
     //3.1统计个热门菜品类别，根据数量进行降序
     val hotTop20 = allInfoDS
@@ -125,11 +123,11 @@ class BatchDataService {
   }
 
   //需求三：统计热门菜品Top10
-  def hotfoodcategoryTop3(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  def hotFoodCategoryTop3(allInfoDS: Dataset[Orders]): Unit = {
     val foodhotTop10 = allInfoDS.groupBy('food_category_id)
       .agg(count("*") as 'hot)
       .orderBy('hot.desc)
-    println("---------统计热门菜品Top10------------")
+    println("---------离线统计热门菜品Top3---------")
     foodhotTop10.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url,
         "Batch_Hot_Food_Top3", dbProperties)
@@ -137,11 +135,11 @@ class BatchDataService {
   }
 
   //需求四：热门餐厅
-  def hotrestaurantTop10(allInfoDS: Dataset[OrderWithRecommendations]): Unit = {
+  def hotrestaurantTop10(allInfoDS: Dataset[Orders]): Unit = {
     val hotrestaurantTop10 = allInfoDS.groupBy('restaurant_id)
       .agg(count("*") as 'hot)
       .orderBy('hot.desc)
-    println("---------统计热门餐厅Top10------------")
+    println("---------离线统计热门餐厅Top10---------")
     hotrestaurantTop10.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Hot_Canteen_Top10", dbProperties)
     hotrestaurantTop10.show(10)
@@ -169,6 +167,7 @@ class BatchDataService {
     val userRecs = model.recommendForUserSubset(userIdDF, 10)
 
     //false 显示的时候。将省略的信息也显示出来
+    println("---------离线推荐根据用户推荐10个餐厅---------")
     userRecs.show(false) //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
 
 
@@ -198,11 +197,11 @@ class BatchDataService {
     })
 
     val ordersDF = allInfoDS.toDF()
-    val restaurantId = ordersDF.select(restaurantId2Int('restaurant_id) as "restaurant_id")
 
     //5.使用模型给用户推荐餐厅  推荐10个高质量客户
     //调用协同过滤模型 model 的 recommendForAllItems() 方法。
     val restRecs = model.recommendForAllItems(10)
+    println("---------离线推荐根据餐厅推荐3个用户---------")
     restRecs.show(false)
 
 
