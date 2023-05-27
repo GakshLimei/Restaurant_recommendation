@@ -30,7 +30,7 @@ object ALSTakeawayTest {
     import org.apache.spark.sql.functions._
 
     //TODO 1.加载数据并处理
-    val path = "output/order_info_test.json"
+    val path = "output/order_info.json"
     val ordersInfoDF: Dataset[Rating] = spark.sparkContext.textFile(path)
       .map(parseOrdersInfo)
       .toDS()
@@ -89,7 +89,7 @@ object ALSTakeawayTest {
     println("模型误差评估：" + rmse)
 
     if (rmse <= 1.5) {
-      val path = "output/als_movie_model_test/" + System.currentTimeMillis()
+      val path = "output/batch_als_order_model/" + System.currentTimeMillis()
       model.save(path)
 
 
