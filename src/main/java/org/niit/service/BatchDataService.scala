@@ -3,9 +3,10 @@ package org.niit.service
 import org.apache.spark.ml.recommendation.ALSModel
 import org.apache.spark.sql.{Dataset, SaveMode}
 import org.niit.bean.{OrderWithRecommendations, Orders}
-import org.niit.dao.{BatchDataDao, BatchDataDao1}
+import org.niit.dao.BatchDataDao
 import org.niit.util.{JDBCUtil, SparkUtil}
 
+import java.sql.DriverManager
 import java.util.Properties
 
 /**
@@ -14,7 +15,7 @@ import java.util.Properties
  * @desc:离线服务层
  */
 //离线批处理服务
-class BatchDataService {
+class BatchDataService extends Serializable{
 
   val spark = SparkUtil.takeSpark()
   val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
@@ -30,14 +31,14 @@ class BatchDataService {
     //离线分析，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
     //1.连接数据库
     //应该放在dao层
-    val takeawayDao1 = new BatchDataDao1
-    val allInfoDS = takeawayDao1.getTakeawayData()
+    val takeawayDao = new BatchDataDao
+    val allInfoDS = takeawayDao.getTakeawayData()
     //需求一：
-    hotCityCountTop10(allInfoDS)
+//    hotCityCountTop5(allInfoDS)
     //需求二：
 //    hotfoodcategoryRecommendTop10(allInfoDS)
     //需求三：
-    hotFoodCategoryTop3(allInfoDS)
+//    hotFoodCategoryTop3(allInfoDS)
     //需求四：
     hotrestaurantTop10(allInfoDS)
   }
@@ -46,30 +47,23 @@ class BatchDataService {
     //模型路径
     val path = "output/batch_als_order_model/1685157225248"
     //1.连接数据库
-    val takeawayDao1 = new BatchDataDao1
-    val allInfoDS = takeawayDao1.getTakeawayData()
+    val takeawayDao = new BatchDataDao
+    val allInfoDS = takeawayDao.getTakeawayData()
     allInfoDS.show()
     //离线推荐一：根据用户推荐10个餐厅
     recommendForAllUsers(allInfoDS, path)
     //离线推荐二：根据餐厅推荐3个用户
     recommendForAllItems(allInfoDS, path)
   }
-  def hotCityCountTop10(allInfoDS: Dataset[Orders]): Unit = {
-    //2.1统计前50道热点题 ----->>在数据库中，即使相同的题目，也是分布在不同行中的
-    val hotTop50 = allInfoDS.groupBy("order_id")
+  def hotCityCountTop5(allInfoDS: Dataset[Orders]): Unit = {
+    val hotTop3 = allInfoDS.groupBy("city_id")
       .agg(count("*") as "hotCount")
       .orderBy('hotCount.desc)
-    //      .limit(10)
-    //2.2将hotTop50和allInfoDS进行关联，得到热点题对应的题目 dropDuplicates:去重
-    val joinDF = hotTop50.join(allInfoDS.dropDuplicates("order_id"), "order_id")
-    //2.3按学科分组聚合各个学科包含热点题的数量
-    val res = joinDF.groupBy("city_id")
-      .agg(count("*") as "hotCount")
-      .orderBy('hotCount.desc)
+      .limit(5)
     println("---------离线统计热门城市Top10---------")
-    res.toDF().write.mode(SaveMode.Overwrite)
+    hotTop3.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Hot_City_Top10", dbProperties)
-    res.show()
+    hotTop3.show()
   }
 
   //需求二： 每个热门食品类别推荐前十个餐厅
@@ -118,16 +112,17 @@ class BatchDataService {
     res.show(10)
   }
 
-  //需求三：统计热门菜品Top10
+  //需求三：统计热门菜品Top3
   def hotFoodCategoryTop3(allInfoDS: Dataset[Orders]): Unit = {
-    val foodhotTop10 = allInfoDS.groupBy('food_category_id)
+    val foodhotTop3 = allInfoDS.groupBy('food_category_id)
       .agg(count("*") as 'hot)
       .orderBy('hot.desc)
+      .limit(3)
     println("---------离线统计热门菜品Top3---------")
-    foodhotTop10.toDF().write.mode(SaveMode.Overwrite)
+    foodhotTop3.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url,
         "Batch_Hot_Food_Top3", dbProperties)
-    foodhotTop10.show(3)
+    foodhotTop3.show()
   }
 
   //需求四：热门餐厅
@@ -135,6 +130,7 @@ class BatchDataService {
     val hotrestaurantTop10 = allInfoDS.groupBy('restaurant_id)
       .agg(count("*") as 'hot)
       .orderBy('hot.desc)
+      .limit(3)
     println("---------离线统计热门餐厅Top10---------")
     hotrestaurantTop10.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Hot_Canteen_Top10", dbProperties)

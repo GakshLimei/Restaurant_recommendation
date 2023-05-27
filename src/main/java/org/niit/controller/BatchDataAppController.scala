@@ -15,7 +15,7 @@ class BatchDataAppController {
   def dispatch(): Unit = {
 
     batchDataService.dataAnalysis()
-    batchDataService.recommendService()
+//    batchDataService.recommendService()
 
 
   }
