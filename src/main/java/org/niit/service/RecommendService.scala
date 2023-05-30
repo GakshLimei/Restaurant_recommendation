@@ -28,24 +28,24 @@ class RecommendService {
 //      HBaseUtil.setHTable("bigdata:takeaway")
 //      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
 //      val path = value(0)
-      val path = "D:\\spark\\usr\\local\\spark\\Takeaway\\Restaurant_recommendation\\output\\als_movie_model_test\\1684484312564"
+      val path = "output/als_model/1684304958773"
 
       //2.加载模型
       val model = ALSModel.load(path)
 
       //3.由于在ALS推荐算法只能存储纯数字东西（用户ID—32 =32）所以在后面使用模型的时候也需要将要读取的数据截取
-      val id2Int = udf((user_id:String) =>{
-        user_id.split("_")(1).toInt    //根据 _ 分割数组，分割后取第二个元素为id，并调用toInt将其转换为整数类型
-      })
-      val restaurantInt = udf((restaurant_id:String) =>{
-        restaurant_id.split("_")(1).toInt
-      })
+//      val id2Int = udf((user_id:String) =>{
+//        user_id.split("_")(1).toInt    //根据 _ 分割数组，分割后取第二个元素为id，并调用toInt将其转换为整数类型
+//      })
+//      val restaurantInt = udf((restaurant_id:String) =>{
+//        restaurant_id.split("_")(1).toInt
+//      })
 
       //4.由于SparkMlib的模型只能加载sparkSQL 所以需要rdd--》dataFrame
       val ordersDF = rdd.toDF()   //将RDD转换为DataFrame，将其命名为 ordersDF
       //调用 select 方法并传入 id2Int('user_id) 表达式，以将 user_id 转换为整数类型,使用 as 关键字给新生成的列起个别名 user_id
-      val userIdDF = ordersDF.select(id2Int('user_id) as "user_id")
-      val restaurantId = ordersDF.select(restaurantInt('restaurant_id) as "restaurant_id")
+      val userIdDF = ordersDF.select("user_id")
+      val restaurantId = ordersDF.select( "restaurant_id")
 
       //5.使用模型给用户推荐餐厅  推荐3个高质量餐厅
       //调用协同过滤模型 model 的 recommendForUserSubset() 方法。
@@ -53,12 +53,12 @@ class RecommendService {
       val recommendDF = model.recommendForUserSubset(userIdDF,3)
       val recommendDF2 = model.recommendForItemSubset(restaurantId,3)
 //      //false 显示的时候。将省略的信息也显示出来
-      recommendDF.show(Int.MaxValue)  //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
-        recommendDF2.show(Int.MaxValue)
+      recommendDF.show(false)  //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
+        recommendDF2.show(false)
 //
 //      //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
       val recommendedDF = recommendDF.as[(Int,Array[(Int,Float)])].map(t =>{
-        val userId:String = "用户ID_" + t._1
+        val userId:Int = t._1
         val restaurantId = t._2.map("餐厅ID_" + _._1).mkString(",")
         (userId,restaurantId)
       }).toDF("user_id","recommendations")
