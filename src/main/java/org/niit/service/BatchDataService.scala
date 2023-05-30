@@ -62,9 +62,6 @@ class BatchDataService extends Serializable {
   //离线推荐一：根据用户推荐10个餐厅
   def recommendForAllUsers(allInfoDS: Dataset[Orders2MySQL], path: String) = {
     val model = ALSModel.load(path)
-    //    import org.apache.spark.sql.functions.udf
-    // 定义UDF，生成整数ID
-
 
     val ordersDF = allInfoDS.toDF()
     val userIdDF = ordersDF.select("user_id")
@@ -161,7 +158,8 @@ class BatchDataService extends Serializable {
       .limit(10)
       .show()
 
-    rids.write.mode(SaveMode.Overwrite)
+    val res = rids.select($"restaurant_id", $"avg_score", $"rank")
+    res.write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Rating_Restaurant_Top10", dbProperties)
   }
 
