@@ -1,7 +1,7 @@
 package org.niit.dao
 
 import org.apache.spark.sql.Dataset
-import org.niit.bean.Orders
+import org.niit.bean.{Orders, Orders2MySQL}
 import org.niit.util.SparkUtil
 
 import java.util.Properties
@@ -17,15 +17,15 @@ class BatchDataDao {
 
   import spark.implicits._
   //获取takeaway表中的数据
-  def getTakeawayData(): Dataset[Orders] = {
+  def getTakeawayData(): Dataset[Orders2MySQL] = {
     val props = new Properties()
     props.setProperty("user", "root")
     props.setProperty("password", "Niit@123")
-    val allInfoDS: Dataset[Orders] = spark.read.jdbc(
+    val allInfoDS: Dataset[Orders2MySQL] = spark.read.jdbc(
       "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8",
-      "orders",
+      "history_orders",
       props
-    ).as[Orders]
+    ).as[Orders2MySQL]
     //返回值
     allInfoDS
   }
