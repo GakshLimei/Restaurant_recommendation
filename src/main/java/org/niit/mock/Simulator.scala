@@ -23,24 +23,24 @@ import scala.util.Random
 object Simulator {
   //模拟数据
   //用户ID
-  val arr1 = ArrayBuffer[String]() //初始化为一个空的 ArrayBuffer 类型的数组
+  val arr1 = ArrayBuffer[Long]() //初始化为一个空的 ArrayBuffer 类型的数组
   for (i <- 1 to 2000) {
-    arr1 += "用户ID_" + i //将每个元素的值设置为字符串 "用户ID_" + i
+    arr1 += i //将每个元素的值设置为字符串 "用户ID_" + i
   }
   //平台ID
-  val arr2 = Array("平台ID_1", "平台ID_2")
+  val arr2 = Array("美团", "饿了么","百度外卖")
   //城市ID
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6", "城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
   //餐厅ID
-  val arr4 = ArrayBuffer[String]() //初始化为一个空的 ArrayBuffer 类型的数组
+  val arr4 = ArrayBuffer[Long]() //初始化为一个空的 ArrayBuffer 类型的数组
   for (i <- 1 to 1000) {
-    arr4 += "餐厅ID_" + i //将每个元素的值设置为字符串 "餐厅ID_" + i
+    arr4 += i //将每个元素的值设置为字符串 "餐厅ID_" + i
   }
   //菜品ID
-  val arr5 = Array("菜品ID_category_1", "菜品ID_category_2", "菜品ID_category_3", "菜品ID_category_4", "菜品ID_category_5", "菜品ID_category_6", "菜品ID_category_7", "菜品ID_category_8", "菜品ID_category_9", "菜品ID_category_10")
+  val arr5 = Array("热菜", "凉菜", "汤类", "火锅", "快餐", "烧烤", "粉面", "披萨意面", "包子馒头", "特色菜")
 
   //订单ID与平台、城市、餐厅、菜品的对应关系,
-  val ordersMap = collection.mutable.HashMap[String, ArrayBuffer[String]]()
+  val ordersMap = collection.mutable.HashMap[String, ArrayBuffer[Long]]()
   val restaurantMap = collection.mutable.HashMap[String, ArrayBuffer[String]]()
   val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
   var ordersID = 1
@@ -51,10 +51,10 @@ object Simulator {
       .append(restaurantID).append("^")
       .append(food_categoryID)
 
-    val ordersArr = ArrayBuffer[String]()
+    val ordersArr = ArrayBuffer[Long]()
     val restaurantArr = ArrayBuffer[String]()
     for (i <- 1 to 20) {
-      ordersArr += "订单ID_" + ordersID
+      ordersArr += ordersID
 
       ordersID += 1
 
@@ -91,6 +91,22 @@ object Simulator {
     //随机菜品ID
     val food_categoryIDRandom = arr5(Random.nextInt(arr5.length))
 
+
+    val cityMap = Map(
+      "城市ID_1" -> "崇左",
+      "城市ID_2" -> "来宾",
+      "城市ID_3" -> "钦州",
+      "城市ID_4" -> "防城港",
+      "城市ID_5" -> "南宁",
+      "城市ID_6" -> "柳州",
+      "城市ID_7" -> "桂林",
+      "城市ID_8" -> "北海",
+      "城市ID_9" -> "玉林",
+      "城市ID_10" -> "百色"
+    )
+
+
+
     val key = new StringBuilder()
       .append(appIDRandom).append("^")
       .append(cityIDRandom).append("^")
@@ -105,6 +121,8 @@ object Simulator {
     val ordersScoreRandom = Random.nextInt(11) + 1 //Kotlin中的Random类的方法，表示生成一个0到10（不包含10）之间的随机整数。
     //随机用户ID
     val userID = arr1(Random.nextInt(arr1.length))
+
+    val city = cityMap.getOrElse(cityIDRandom, "")
 
     //下单时间  将当前系统时间格式化为指定的日期格式，用于后续的业务处理和记录
     // 指定日期范围
@@ -122,6 +140,6 @@ object Simulator {
     val orderTime = sdf.format(new Date(randomTS)) //将随机生成的时间的的毫秒值转换为Date对象，并将其格式化为指定格式的日期字符串，格式化的规则由变量sdf决定。其中，sdf代表SimpleDateFormat对象，是Java中常用的日期格式化类，用于将时间格式化为指定的格式字符串
 
 
-    Orders(userID, appIDRandom, cityIDRandom, restaurantIDRandom, food_categoryIDRandom, ordersIDRandom, ordersScoreRandom, orderTime, timestamp)
+    Orders(userID, appIDRandom, city, restaurantIDRandom, food_categoryIDRandom, ordersIDRandom, ordersScoreRandom, orderTime, timestamp)
   }
 }

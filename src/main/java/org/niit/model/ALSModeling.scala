@@ -108,8 +108,8 @@ object ALSModeling {
     //1.获取用户订单信息(用户id,订单id,订单评分)
     val gson: Gson = new Gson()
     val orders: Orders = gson.fromJson(json, classOf[Orders])
-    val userID: Long = orders.user_id.split("_")(1).toLong
-    val restaurantID: Long = orders.restaurant_id.split("_")(1).toLong
+    val userID: Long = orders.user_id
+    val restaurantID: Long = orders.restaurant_id
     val rating: Int = orders.score
 
     //2.计算推荐指数:得分高的订单,推荐指数高

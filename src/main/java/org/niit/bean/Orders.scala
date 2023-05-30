@@ -18,12 +18,12 @@ import java.sql.Timestamp
  */
 //all:用户，平台（例如美团），城市，餐厅，菜品类别（烧烤，火锅......），
 //订单ID，用户评分，提交时间，时间戳
-case class Orders(user_id: String, //用户ID
-                  app_id: String, //平台ID
-                  city_id: String, //城市ID
-                  restaurant_id: String, //餐厅ID
-                  food_category_id: String, //菜品ID
-                  order_id: String, //订单ID
+case class Orders(user_id: Long, //用户ID
+                  app_name: String, //平台ID
+                  city_name: String, //城市ID
+                  restaurant_id: Long, //餐厅ID
+                  food_category: String, //菜品ID
+                  order_id: Long, //订单ID
                   score: Int, //用户评分
                   order_time: String, //订单提交时间，yyyy-MM-dd HH:mm:ss字符串形式
                   ts: Timestamp //答题提交时间，时间戳形式

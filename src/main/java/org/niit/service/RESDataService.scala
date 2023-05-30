@@ -9,6 +9,10 @@ import org.niit.bean.Orders
 
 class RESDataService {
 
+      //定义数据库连接的相关信息
+      val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
+      val user = "root"
+      val password = "Niit@123"
   def dataAnalysis(top: DStream[Orders]): Unit = {
 
     popularDishesTop10(top)
@@ -24,7 +28,7 @@ class RESDataService {
     //使用 map 函数将 top 中的每个元素映射为一个键值对 (data.food_category_id,1)，
     // 其中 data.food_category_id 是外卖菜品的 ID，1 是计数值。
     val mapDS = top.map(data => {
-      (data.food_category_id, 1)
+      (data.food_category, 1)
     })
 
     //使用 reduceByKey 函数将具有相同键的键值对进行聚合，将其值相加。
@@ -51,16 +55,12 @@ class RESDataService {
       val resultDF = spark.createDataset(top10).toDF("categoryID", "number")
       resultDF.createOrReplaceTempView("categoryTop10")
 
-      //定义数据库连接的相关信息
-      val url = "jdbc:mysql://localhost:3306/takeaway?useUnicode=true&characterEncoding=utf8"
-      val user = "root"
-      val password = "root"
 
       //使用 orderBy 函数对结果进行排序，按照 "number" 列进行降序排序。然后使用 write 函数将结果写入数据库，模式为 SaveMode.Append，即追加模式。
       //使用 jdbc 函数指定数据库连接信息，并指定表名为 "categoryTop10"。同时，使用一个匿名内部类创建一个 Properties 对象，并设置相关属性。
       resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "categoryTop10", new java.util.Properties() {
         {
-          setProperty("driver", "com.mysql.cj.jdbc.Driver")
+          setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)
           setProperty("password", password)
         }
@@ -77,7 +77,7 @@ class RESDataService {
   private def takeawaySalesCitiesTop10(top: DStream[Orders]): Unit = {
 
     val mapDS = top.map(data => {
-      (data.city_id, 1)
+      (data.city_name, 1)
     })
     //
     val reduceData = mapDS.reduceByKey(_ + _)
@@ -96,13 +96,10 @@ class RESDataService {
       val resultDF = spark.createDataset(top10).toDF("citiesID", "number")
       resultDF.createOrReplaceTempView("citiesTop10")
 
-      val url = "jdbc:mysql://localhost:3306/takeaway?useUnicode=true&characterEncoding=utf8"
-      val user = "root"
-      val password = "root"
 
       resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "citiesTop10", new java.util.Properties() {
         {
-          setProperty("driver", "com.mysql.cj.jdbc.Driver")
+          setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)
           setProperty("password", password)
         }
@@ -137,13 +134,10 @@ class RESDataService {
       val resultDF = spark.createDataset(top5).toDF("restaurant_ID", "number")
       resultDF.createOrReplaceTempView("restaurantsTop5")
 
-      val url = "jdbc:mysql://localhost:3306/takeaway?useUnicode=true&characterEncoding=utf8"
-      val user = "root"
-      val password = "root"
 
       resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "restaurantsTop5", new java.util.Properties() {
         {
-          setProperty("driver", "com.mysql.cj.jdbc.Driver")
+          setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)
           setProperty("password", password)
         }
