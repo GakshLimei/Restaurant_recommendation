@@ -54,7 +54,7 @@ class RecommendService {
       val recommendDF2 = model.recommendForItemSubset(restaurantId,3)
 //      //false 显示的时候。将省略的信息也显示出来
       recommendDF.show(false)  //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
-        recommendDF2.show(false)
+//        recommendDF2.show(false)
 //
 //      //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
       val recommendedDF = recommendDF.as[(Int,Array[(Int,Float)])].map(t =>{
@@ -64,7 +64,7 @@ class RecommendService {
       }).toDF("user_id","recommendations")
 
       val recommendedDF2 = recommendDF2.as[(Int,Array[(Int,Float)])].map( t =>{
-        val restaurantId: String = "餐厅ID_" + t._1
+        val restaurantId: Int = t._1
         val userId = t._2.map("用户ID_" + _._1).mkString(",")
         (restaurantId,userId)
       }).toDF("restaurant_id","recommendations")
@@ -78,6 +78,7 @@ class RecommendService {
       val allInfoDF2 = ordersDF.join(recommendedDF2,"restaurant_id").select("restaurant_id","recommendations")
 
 
+      allInfoDF.show()
       // 3. 设置数据库连接属性
       val dbProperties = new Properties()
       dbProperties.put("user", "root")
