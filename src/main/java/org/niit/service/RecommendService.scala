@@ -28,7 +28,7 @@ class RecommendService {
 //      HBaseUtil.setHTable("bigdata:takeaway")
 //      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
 //      val path = value(0)
-      val path = "output/als_model/1684304958773"
+      val path = "output/batch_als_order_model/1685549315179"
 
       //2.加载模型
       val model = ALSModel.load(path)
@@ -54,7 +54,7 @@ class RecommendService {
       val recommendDF2 = model.recommendForItemSubset(restaurantId,3)
 //      //false 显示的时候。将省略的信息也显示出来
       recommendDF.show(false)  //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
-//        recommendDF2.show(false)
+        recommendDF2.show(false)
 //
 //      //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
       val recommendedDF = recommendDF.as[(Int,Array[(Int,Float)])].map(t =>{
@@ -78,7 +78,6 @@ class RecommendService {
       val allInfoDF2 = ordersDF.join(recommendedDF2,"restaurant_id").select("restaurant_id","recommendations")
 
 
-      allInfoDF.show()
       // 3. 设置数据库连接属性
       val dbProperties = new Properties()
       dbProperties.put("user", "root")

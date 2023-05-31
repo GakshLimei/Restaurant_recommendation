@@ -13,7 +13,7 @@ class Write2MySQLController {
   private val write2mysql = new Write2MySQLService()
 
   def dispatch(): Unit = {
-    val orderData = DataHandler.kafkaOrdersDatHandler("BD2", "takeaway")
+    val orderData = DataHandler.kafkaOrdersDatHandler("Consumer_group1", "takeaway")
     write2mysql.writetomysql(orderData)
 
     DataHandler.startAndAwait() //等待kafka关闭采集
