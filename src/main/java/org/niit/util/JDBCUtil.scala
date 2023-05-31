@@ -1,10 +1,10 @@
 package org.niit.util
 
 
+import com.alibaba.druid.pool.DruidDataSourceFactory
+
 import java.sql.{Connection, PreparedStatement, ResultSet}
 import java.util.Properties
-
-import com.alibaba.druid.pool.DruidDataSourceFactory
 import javax.sql.DataSource
 
 /**
@@ -15,7 +15,7 @@ import javax.sql.DataSource
  */
 object JDBCUtil {
   //初始化连接池
-  var dataSource:DataSource = init()
+  var dataSource: DataSource = init()
 
 
   def init(): DataSource = {
@@ -32,7 +32,7 @@ object JDBCUtil {
     dataSource.getConnection
   }
 
-  def executeUpdata(connection: Connection,sql:String,params:Array[Any]): Unit = {
+  def executeUpdata(connection: Connection, sql: String, params: Array[Any]): Unit = {
     var rtn = 0
     var pstmt: PreparedStatement = null
     try {

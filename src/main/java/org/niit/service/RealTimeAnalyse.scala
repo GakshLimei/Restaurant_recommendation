@@ -1,13 +1,12 @@
 package org.niit.service
 
 
-import java.io.PrintWriter
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-import org.apache.spark.sql.{DataFrame, Row, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
 import org.niit.bean.Orders
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class RealTimeAnalyse {
   def dataAnalysis(orders: DStream[Orders]): Unit = {
@@ -30,17 +29,19 @@ class RealTimeAnalyse {
       import spark.implicits._
 
       val resultDF = spark.createDataset(top10).toDF("category", "score")
-     resultDF.createOrReplaceTempView("top10_cuisine")
+      resultDF.createOrReplaceTempView("top10_cuisine")
 
       val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
       val user = "root"
       val password = "Niit@123"
 
-      resultDF.write.mode(SaveMode.Append).jdbc(url, "RT_top10_cuisines", new java.util.Properties() {{
-        setProperty("driver", "com.mysql.jdbc.Driver")
-        setProperty("user", user)
-        setProperty("password", password)
-      }})
+      resultDF.write.mode(SaveMode.Append).jdbc(url, "RT_top10_cuisines", new java.util.Properties() {
+        {
+          setProperty("driver", "com.mysql.jdbc.Driver")
+          setProperty("user", user)
+          setProperty("password", password)
+        }
+      })
 
 
     })
@@ -77,11 +78,6 @@ class RealTimeAnalyse {
       val eveningRDD = timePeriodRDD.filter(record => record._1 == "晚上").sortBy(_._2, false)
 
 
-
-
-
-
-
       println("---------根据时间段统计餐厅下单量---------")
       println("----------清晨-餐厅下单量TOP20---------")
       morningRDD.take(20).foreach(println)
@@ -100,7 +96,7 @@ class RealTimeAnalyse {
       import spark.implicits._
 
 
-      val orderStatsDF = timePeriodRDD.toDF( "time", "order_time")
+      val orderStatsDF = timePeriodRDD.toDF("time", "order_time")
       println("---------根据时间段统计平台下单量test---------")
 
 
@@ -165,7 +161,7 @@ class RealTimeAnalyse {
       import spark.implicits._
 
 
-      val orderStatsDF = timePeriodRDD.toDF( "time", "order_time")
+      val orderStatsDF = timePeriodRDD.toDF("time", "order_time")
       println("---------根据时间段统计平台下单量test---------")
 
 
@@ -187,7 +183,6 @@ class RealTimeAnalyse {
     })
   }
   //写入数据库
-
 
 
 }

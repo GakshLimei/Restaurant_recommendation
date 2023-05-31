@@ -10,6 +10,6 @@ import org.niit.bean.AdClickData
  * @项目 org.niit.common
  */
 trait TController {
-  def dispatch(data:DStream[AdClickData]):Unit
+  def dispatch(data: DStream[AdClickData]): Unit
 
 }

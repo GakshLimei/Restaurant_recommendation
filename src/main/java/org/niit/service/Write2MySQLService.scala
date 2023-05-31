@@ -29,8 +29,8 @@ class Write2MySQLService() {
           .option("user", "root")
           .option("password", "Niit@123")
           .option("batchsize", "1000") // 指定批量写入大小
-//          .option("createTablePrimaryKey", "order_id")
-//          .option("createTableOptions", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表' PRIMARY KEY (order_id)")
+          //          .option("createTablePrimaryKey", "order_id")
+          //          .option("createTableOptions", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表' PRIMARY KEY (order_id)")
           .option("createTableColumnTypes", "user_id varchar(10), app_name varchar(10) , city_name varchar(10), restaurant_id varchar(10), food_category varchar(10) , order_id varchar(10)")
           .mode(SaveMode.Append)
           .save()

@@ -1,6 +1,5 @@
 package org.niit.service
 
-import org.apache.spark.rdd
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
@@ -9,10 +8,11 @@ import org.niit.bean.Orders
 
 class RESDataService {
 
-      //定义数据库连接的相关信息
-      val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
-      val user = "root"
-      val password = "Niit@123"
+  //定义数据库连接的相关信息
+  val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
+  val user = "root"
+  val password = "Niit@123"
+
   def dataAnalysis(top: DStream[Orders]): Unit = {
 
     popularDishesTop10(top)

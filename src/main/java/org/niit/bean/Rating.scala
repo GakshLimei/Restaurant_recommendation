@@ -7,7 +7,7 @@ package org.niit.bean
  * @项目 org.niit.bean
  */
 case class Rating(
-                 user_id:Long,    //用户id
-                 restaurant_id:Long,  //餐厅id
-                 rating:Float  //推荐指数
-                 )extends Serializable
+                   user_id: Long, //用户id
+                   restaurant_id: Long, //餐厅id
+                   rating: Float //推荐指数
+                 ) extends Serializable

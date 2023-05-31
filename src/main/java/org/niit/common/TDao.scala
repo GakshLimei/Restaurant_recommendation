@@ -10,8 +10,11 @@ import org.niit.util.SparkUtil
  */
 trait TDao {
   val sc = SparkUtil.takeSSC()
-  def selecBlackUserById(userid:String):Boolean
-  def insertBlackList(userid:String):Unit
-  def insertUserAdCount(day:String,user:String,ad:String,count:Int):Unit
+
+  def selecBlackUserById(userid: String): Boolean
+
+  def insertBlackList(userid: String): Unit
+
+  def insertUserAdCount(day: String, user: String, ad: String, count: Int): Unit
 
 }

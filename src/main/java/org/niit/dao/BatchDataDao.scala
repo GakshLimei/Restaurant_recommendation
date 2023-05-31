@@ -1,7 +1,7 @@
 package org.niit.dao
 
 import org.apache.spark.sql.Dataset
-import org.niit.bean.{Orders, Orders2MySQL}
+import org.niit.bean.Orders2MySQL
 import org.niit.util.SparkUtil
 
 import java.util.Properties
@@ -16,6 +16,7 @@ class BatchDataDao {
   private val spark = SparkUtil.takeSpark()
 
   import spark.implicits._
+
   //获取history_orders表中的数据
   def getTakeawayData(): Dataset[Orders2MySQL] = {
     val props = new Properties()

@@ -7,5 +7,5 @@ package org.niit.common
  * @项目 org.niit.common
  */
 trait TRealTimeDao {
-  def insertRealTimeAd(day:String,area:String,city:String,ad:String,count:String):Unit
+  def insertRealTimeAd(day: String, area: String, city: String, ad: String, count: String): Unit
 }

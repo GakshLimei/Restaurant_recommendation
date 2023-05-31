@@ -27,7 +27,6 @@ object ALSTakeawayTest {
     val sc: SparkContext = spark.sparkContext
     sc.setLogLevel("WARN")
     import spark.implicits._
-    import org.apache.spark.sql.functions._
 
     //TODO 1.加载数据并处理
     val path = "output/order_info.json"

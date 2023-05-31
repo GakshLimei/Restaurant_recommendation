@@ -11,22 +11,21 @@ import org.niit.util.SparkUtil
  * @项目 org.niit.common
  */
 trait TApp {
-  def start(master:String = "local[*]",appName:String = "application")(op : => Unit) {
+  def start(master: String = "local[*]", appName: String = "application")(op: => Unit) {
     val sparkConf = new SparkConf().setMaster(master).setAppName(appName)
-    val sc = SparkUtil.CreateSpark(sparkConf,Seconds(5))
+    val sc = SparkUtil.CreateSpark(sparkConf, Seconds(5))
     val spark = SparkUtil.takeSpark()
     val ssc = SparkUtil.takeSSC()
     sc.setLogLevel("ERROR")
 
 
-
-    try{
+    try {
       op
-    }catch {
+    } catch {
       case ex => ex.printStackTrace()
     }
     spark.stop()
-    ssc.stop(true,true)
+    ssc.stop(true, true)
     sc.stop()
     SparkUtil.clear()
 

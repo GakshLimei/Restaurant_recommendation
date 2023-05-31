@@ -1,13 +1,10 @@
 package org.niit.model
 
 import com.google.gson.Gson
-import org.apache.hadoop.hbase.client.Put
-import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.recommendation.{ALS, ALSModel}
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 import org.niit.bean.{Orders, Rating}
-import org.niit.util.HBaseUtil
 
 /**
  * @作者 YanTianCheng
@@ -44,12 +41,12 @@ object ALSModeling {
       .setRank(20)
       .setMaxIter(15)
       .setRegParam(0.09)
-      .setUserCol("user_id")//设置用户id是哪一列
-      .setItemCol("restaurant_id")//设置餐厅id是哪一列
-      .setRatingCol("rating")//设置评分列
+      .setUserCol("user_id") //设置用户id是哪一列
+      .setItemCol("restaurant_id") //设置餐厅id是哪一列
+      .setRatingCol("rating") //设置评分列
 
     //5.使用训练集进行训练
-    val model:ALSModel = als.fit(randomSplits(0)).setColdStartStrategy("drop")
+    val model: ALSModel = als.fit(randomSplits(0)).setColdStartStrategy("drop")
 
     //6.获得推荐
     val recommend: DataFrame = model.recommendForAllUsers(20)
@@ -78,22 +75,22 @@ object ALSModeling {
 
     //10.将训练好的模型保存到文件系统并将文件系统的路径存储到HBase
 
-//    HBaseUtil.setHTable("bigdata:student")
+    //    HBaseUtil.setHTable("bigdata:student")
     if (rmse <= 1.5) {
       val path = "output/als_model/" + System.currentTimeMillis()
       model.save(path)
-//      val put: Put = new Put(Bytes.toBytes("als_model-recommended_question_id"))
-//      put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("path"), Bytes.toBytes(path))
-//      HBaseUtil.putData(put)
+      //      val put: Put = new Put(Bytes.toBytes("als_model-recommended_question_id"))
+      //      put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("path"), Bytes.toBytes(path))
+      //      HBaseUtil.putData(put)
       //调用 HBaseUtil 类的 setHTable 方法，将 HBase 表名 "bigdata:student" 设置为当前对象的 HTable。
       //判断模型的 RMSE(均方根误差)是否小于等于 1.5。如果是，则执行下一步操作。
       //生成一个保存模型的路径 path,格式为 "output/als_model/" + System.currentTimeMillis()。
       //将模型保存到该路径下，并将保存后的文件名作为值，列族名为 "info",列名为 "path",列值为字节数组 path。
       //调用 HBaseUtil 类的 putData 方法，将保存好的模型数据 put 存储到 HBase 表中。
 
-//      println("模型path信息已保存到HBase")
+      //      println("模型path信息已保存到HBase")
 
-  }
+    }
     //11.释放缓存/关闭资源
     ordersInfoDF.unpersist()
     randomSplits(0).unpersist()
@@ -114,12 +111,12 @@ object ALSModeling {
 
     //2.计算推荐指数:得分高的订单,推荐指数高
     val ratingFix: Int =
-      if (rating >= 8) 3    //评分大于等于8的推荐指数为3
-      else if (rating < 8 && rating <= 3) 2   //评分3-8的推荐指数2
-      else 1    //其他的推荐指数为1
+      if (rating >= 8) 3 //评分大于等于8的推荐指数为3
+      else if (rating < 8 && rating <= 3) 2 //评分3-8的推荐指数2
+      else 1 //其他的推荐指数为1
 
-      //3.返回用户id，问题id,推荐指数
-      Rating(userID, restaurantID, ratingFix)
+    //3.返回用户id，问题id,推荐指数
+    Rating(userID, restaurantID, ratingFix)
   }
 
 }

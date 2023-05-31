@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 
 import java.util.Properties
 import java.util.concurrent.{ArrayBlockingQueue, ThreadPoolExecutor, TimeUnit}
+
 /**
  * 使用线程池调度Kafka生产者发送任务,将数据实时发送到Kafka
  */

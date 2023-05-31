@@ -35,15 +35,83 @@ class BatchDataService extends Serializable {
     val takeawayDao = new BatchDataDao
     val allInfoDS = takeawayDao.getTakeawayData()
     //需求一：离线统计热门城市Top5
-        hotCityCountTop5(allInfoDS)
+    hotCityCountTop5(allInfoDS)
     //需求二：离线统计高评分餐厅Top10
-        highRatingRestaurantTop10(allInfoDS)
+    highRatingRestaurantTop10(allInfoDS)
     //需求三：离线统计热门菜品Top3
-        hotFoodCategoryTop3(allInfoDS)
+    hotFoodCategoryTop3(allInfoDS)
     //需求四：离线统计热门餐厅Top10
-        hotrestaurantTop10(allInfoDS)
+    hotrestaurantTop10(allInfoDS)
   }
 
+  //需求一：离线统计热门城市Top5
+  def hotCityCountTop5(allInfoDS: Dataset[Orders2MySQL]): Unit = {
+    // 根据城市分组并统计数量
+    val cityCountDS = allInfoDS.groupBy($"city_name").count()
+
+    // 按照数量倒序排序并取前5个
+    val top5DS = cityCountDS.orderBy($"count".desc).limit(5)
+    top5DS.write.mode(SaveMode.Overwrite)
+      .jdbc(url, "Batch_Hot_City_Top10", dbProperties)
+
+    println("---------离线统计热门城市Top3---------")
+    // 显示结果
+    top5DS.show()
+
+  }
+
+  //需求二： 离线统计高评分餐厅Top10
+  def highRatingRestaurantTop10(allInfoDS: Dataset[Orders2MySQL]) = {
+    // 先按照餐厅ID和评分进行分组，统计每个餐厅的平均评分
+    val restaurantAvgScoreDF = allInfoDS.groupBy($"restaurant_id")
+      .agg(avg($"score").as("avg_score"))
+
+
+    // 再按照餐厅ID进行分组，统计每个餐厅的平均评分排名
+    val restaurantRankDF = restaurantAvgScoreDF
+      .withColumn("rank", dense_rank().over(Window.orderBy(desc("avg_score"))))
+      .filter($"rank" <= 10)
+
+
+    // 通过关联获取餐厅信息
+    println("---------离线统计高评分餐厅Top10---------")
+    val rids = allInfoDS.join(restaurantRankDF, Seq("restaurant_id"))
+    rids.select($"restaurant_id", $"avg_score", $"rank")
+      .distinct()
+      .orderBy("rank")
+      .limit(10)
+      .show()
+
+    val res = rids.select($"restaurant_id", $"avg_score", $"rank")
+    res.write.mode(SaveMode.Overwrite)
+      .jdbc(url, "Batch_Rating_Restaurant_Top10", dbProperties)
+  }
+
+  //需求三：离线统计热门菜品Top3
+  def hotFoodCategoryTop3(allInfoDS: Dataset[Orders2MySQL]): Unit = {
+    val foodhotTop3 = allInfoDS.groupBy('food_category)
+      .agg(count("*") as 'hot)
+      .orderBy('hot.desc)
+      .limit(3)
+
+    println("---------离线统计热门菜品Top3---------")
+    foodhotTop3.toDF().write.mode(SaveMode.Overwrite)
+      .jdbc(url,
+        "Batch_Hot_Food_Top3", dbProperties)
+    foodhotTop3.show()
+  }
+
+  //需求四：离线统计热门餐厅Top10
+  def hotrestaurantTop10(allInfoDS: Dataset[Orders2MySQL]): Unit = {
+    val hotrestaurantTop10 = allInfoDS.groupBy(Symbol("restaurant_id"))
+      .agg(count("*") as 'hot)
+      .orderBy('hot.desc)
+      .limit(3)
+    println("---------离线统计热门餐厅Top10---------")
+    hotrestaurantTop10.toDF().write.mode(SaveMode.Overwrite)
+      .jdbc(url, "Batch_Hot_Canteen_Top10", dbProperties)
+    hotrestaurantTop10.show(10)
+  }
 
   def recommendService(): Unit = {
     //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
@@ -118,75 +186,6 @@ class BatchDataService extends Serializable {
     allInfoDF1.write.mode(SaveMode.Overwrite)
       .jdbc(url, rectable, dbProperties)
 
-  }
-
-  //需求一：离线统计热门城市Top5
-  def hotCityCountTop5(allInfoDS: Dataset[Orders2MySQL]): Unit = {
-    // 根据城市分组并统计数量
-    val cityCountDS = allInfoDS.groupBy($"city_name").count()
-
-    // 按照数量倒序排序并取前5个
-    val top5DS = cityCountDS.orderBy($"count".desc).limit(5)
-    top5DS.write.mode(SaveMode.Overwrite)
-      .jdbc(url, "Batch_Hot_City_Top10", dbProperties)
-
-    println("---------离线统计热门城市Top3---------")
-    // 显示结果
-    top5DS.show()
-
-  }
-
-  //需求二： 离线统计高评分餐厅Top10
-  def highRatingRestaurantTop10(allInfoDS: Dataset[Orders2MySQL]) = {
-    // 先按照餐厅ID和评分进行分组，统计每个餐厅的平均评分
-    val restaurantAvgScoreDF = allInfoDS.groupBy($"restaurant_id")
-      .agg(avg($"score").as("avg_score"))
-
-
-    // 再按照餐厅ID进行分组，统计每个餐厅的平均评分排名
-    val restaurantRankDF = restaurantAvgScoreDF
-      .withColumn("rank", dense_rank().over(Window.orderBy(desc("avg_score"))))
-      .filter($"rank" <= 10)
-
-
-    // 通过关联获取餐厅信息
-    println("---------离线统计高评分餐厅Top10---------")
-    val rids = allInfoDS.join(restaurantRankDF, Seq("restaurant_id"))
-    rids.select($"restaurant_id", $"avg_score", $"rank")
-      .distinct()
-      .orderBy("rank")
-      .limit(10)
-      .show()
-
-    val res = rids.select($"restaurant_id", $"avg_score", $"rank")
-    res.write.mode(SaveMode.Overwrite)
-      .jdbc(url, "Batch_Rating_Restaurant_Top10", dbProperties)
-  }
-
-  //需求三：离线统计热门菜品Top3
-  def hotFoodCategoryTop3(allInfoDS: Dataset[Orders2MySQL]): Unit = {
-    val foodhotTop3 = allInfoDS.groupBy('food_category)
-      .agg(count("*") as 'hot)
-      .orderBy('hot.desc)
-      .limit(3)
-
-    println("---------离线统计热门菜品Top3---------")
-    foodhotTop3.toDF().write.mode(SaveMode.Overwrite)
-      .jdbc(url,
-        "Batch_Hot_Food_Top3", dbProperties)
-    foodhotTop3.show()
-  }
-
-  //需求四：离线统计热门餐厅Top10
-  def hotrestaurantTop10(allInfoDS: Dataset[Orders2MySQL]): Unit = {
-    val hotrestaurantTop10 = allInfoDS.groupBy(Symbol("restaurant_id"))
-      .agg(count("*") as 'hot)
-      .orderBy('hot.desc)
-      .limit(3)
-    println("---------离线统计热门餐厅Top10---------")
-    hotrestaurantTop10.toDF().write.mode(SaveMode.Overwrite)
-      .jdbc(url, "Batch_Hot_Canteen_Top10", dbProperties)
-    hotrestaurantTop10.show(10)
   }
 
 }

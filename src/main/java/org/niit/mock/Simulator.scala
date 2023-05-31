@@ -28,7 +28,7 @@ object Simulator {
     arr1 += i //将每个元素的值设置为字符串 "用户ID_" + i
   }
   //平台ID
-  val arr2 = Array("美团", "饿了么","百度外卖")
+  val arr2 = Array("美团", "饿了么", "百度外卖")
   //城市ID
   val arr3 = Array("城市ID_1", "城市ID_2", "城市ID_3", "城市ID_4", "城市ID_5", "城市ID_6", "城市ID_7", "城市ID_8", "城市ID_9", "城市ID_10")
   //餐厅ID
@@ -104,7 +104,6 @@ object Simulator {
       "城市ID_9" -> "玉林",
       "城市ID_10" -> "百色"
     )
-
 
 
     val key = new StringBuilder()

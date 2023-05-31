@@ -1,9 +1,8 @@
 package org.niit.util
 
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Duration, Seconds, StreamingContext}
-import org.niit.util.SparkUtil.{putSC, putSSC, putSpark}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * @作者 YanTianCheng
@@ -12,7 +11,7 @@ import org.niit.util.SparkUtil.{putSC, putSSC, putSpark}
  * @项目 org.niit.util
  */
 object SparkUtil {
-  private val scLocal = new ThreadLocal[SparkContext]   //专门存储SC的线程池
+  private val scLocal = new ThreadLocal[SparkContext] //专门存储SC的线程池
   private val sparkLocal = new ThreadLocal[SparkSession]
   private val sscLocal = new ThreadLocal[StreamingContext]
   private var sc: SparkContext = _;
@@ -38,6 +37,18 @@ object SparkUtil {
     sc
   }
 
+  private def putSC(sc: SparkContext): Unit = {
+    scLocal.set(sc)
+  }
+
+  private def putSpark(spark: SparkSession): Unit = {
+    sparkLocal.set(spark)
+  }
+
+  private def putSSC(ssc: StreamingContext): Unit = {
+    sscLocal.set(ssc)
+  }
+
   def getOrCreateStreamingContext(sparkContext: SparkContext, seconds: Duration): StreamingContext = {
 
 
@@ -48,19 +59,6 @@ object SparkUtil {
       putSSC(ssc)
     }
     ssc
-  }
-
-  private def putSC(sc: SparkContext): Unit = {
-    scLocal.set(sc)
-  }
-
-
-  private def putSpark(spark: SparkSession): Unit = {
-    sparkLocal.set(spark)
-  }
-
-  private def putSSC(ssc: StreamingContext): Unit = {
-    sscLocal.set(ssc)
   }
 
   def takeSC(): SparkContext = {

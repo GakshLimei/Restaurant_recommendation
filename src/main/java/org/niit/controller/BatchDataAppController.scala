@@ -1,6 +1,5 @@
 package org.niit.controller
 
-import org.niit.handler.DataHandler
 import org.niit.service.BatchDataService
 
 /**

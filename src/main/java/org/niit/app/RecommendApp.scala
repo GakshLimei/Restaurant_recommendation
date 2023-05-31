@@ -9,8 +9,8 @@ import org.niit.controller.RecommendController
  * @文件: RecommendApp
  * @项目 org.niit.app
  */
-object RecommendApp extends App with TApp{
-  start("local[*]","recommend"){
+object RecommendApp extends App with TApp {
+  start("local[*]", "recommend") {
     val recommendController = new RecommendController
     recommendController.dispatch()
 

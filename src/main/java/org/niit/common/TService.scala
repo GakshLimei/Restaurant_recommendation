@@ -10,6 +10,6 @@ import org.niit.bean.AdClickData
  * @项目 org.niit.common
  */
 trait TService {
-  def dataAnalysis(data:DStream[AdClickData]):Any
+  def dataAnalysis(data: DStream[AdClickData]): Any
 
 }

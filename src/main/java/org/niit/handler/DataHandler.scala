@@ -14,12 +14,13 @@ import org.niit.util.{MyKafkaUtil, SparkUtil}
  */
 object DataHandler {
   val ssc = SparkUtil.takeSSC()
-  def kafkaAdDataHandler(group:String,topic:String):DStream[AdClickData]={
-    val kfData:InputDStream[ConsumerRecord[String,String]] = MyKafkaUtil.getKafkaStream(group,topic,ssc)
-    val adClickData:DStream[AdClickData] = kfData.map(kafkaDat =>{
+
+  def kafkaAdDataHandler(group: String, topic: String): DStream[AdClickData] = {
+    val kfData: InputDStream[ConsumerRecord[String, String]] = MyKafkaUtil.getKafkaStream(group, topic, ssc)
+    val adClickData: DStream[AdClickData] = kfData.map(kafkaDat => {
       val data = kafkaDat.value()
       val datas = data.split(" ")
-      AdClickData(datas(0),datas(1),datas(2),datas(3),datas(4))
+      AdClickData(datas(0), datas(1), datas(2), datas(3), datas(4))
     })
     adClickData
   }
@@ -31,14 +32,14 @@ object DataHandler {
   //返回adClickData数据流对象。
   //总的来说，这段代码的作用是从Kafka消息队列中读取广告点击数据，然后将数据转换为指定格式的数据流，以便后续进行实时分析和处理。
 
-  def kafkaOrdersDatHandler(group:String,topic:String):DStream[Orders]={
+  def kafkaOrdersDatHandler(group: String, topic: String): DStream[Orders] = {
     //从Kafka中获得数据
-    val kfDataDS:InputDStream[ConsumerRecord[String,String]] = MyKafkaUtil.getKafkaStream(group,topic, ssc)
-    val ordersData:DStream[Orders] = kfDataDS.map(kafkaData =>{
+    val kfDataDS: InputDStream[ConsumerRecord[String, String]] = MyKafkaUtil.getKafkaStream(group, topic, ssc)
+    val ordersData: DStream[Orders] = kfDataDS.map(kafkaData => {
       val data = kafkaData.value()
       //JSON --> JavaScr
       val gson = new Gson();
-      val orders:Orders = gson.fromJson(data,classOf[Orders])
+      val orders: Orders = gson.fromJson(data, classOf[Orders])
       orders
     })
     ordersData
