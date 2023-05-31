@@ -59,7 +59,7 @@ class KafkaProducerThread extends Thread {
           }
         }
       })
-      Thread.sleep(300)
+      Thread.sleep(100)
     }
   }
 }

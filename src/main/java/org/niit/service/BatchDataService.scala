@@ -34,7 +34,7 @@ class BatchDataService extends Serializable {
     //应该放在dao层
     val takeawayDao = new BatchDataDao
     val allInfoDS = takeawayDao.getTakeawayData()
-    //需求一：离线统计离线统计热门菜品Top5
+    //需求一：离线统计热门城市Top5
         hotCityCountTop5(allInfoDS)
     //需求二：离线统计高评分餐厅Top10
         highRatingRestaurantTop10(allInfoDS)

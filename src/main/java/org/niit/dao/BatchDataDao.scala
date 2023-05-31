@@ -16,7 +16,7 @@ class BatchDataDao {
   private val spark = SparkUtil.takeSpark()
 
   import spark.implicits._
-  //获取takeaway表中的数据
+  //获取history_orders表中的数据
   def getTakeawayData(): Dataset[Orders2MySQL] = {
     val props = new Properties()
     props.setProperty("user", "root")
