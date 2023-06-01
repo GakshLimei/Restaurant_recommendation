@@ -58,7 +58,7 @@ class RESDataService {
 
       //使用 orderBy 函数对结果进行排序，按照 "number" 列进行降序排序。然后使用 write 函数将结果写入数据库，模式为 SaveMode.Append，即追加模式。
       //使用 jdbc 函数指定数据库连接信息，并指定表名为 "categoryTop10"。同时，使用一个匿名内部类创建一个 Properties 对象，并设置相关属性。
-      resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "RTA_categoryTop10", new java.util.Properties() {
+      resultDF.orderBy($"number".desc).write.mode(SaveMode.Overwrite).jdbc(url, "RTA_categoryTop10", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)
@@ -97,7 +97,7 @@ class RESDataService {
       resultDF.createOrReplaceTempView("citiesTop10")
 
 
-      resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "RTA_citiesTop10", new java.util.Properties() {
+      resultDF.orderBy($"number".desc).write.mode(SaveMode.Overwrite).jdbc(url, "RTA_citiesTop10", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)
@@ -135,7 +135,7 @@ class RESDataService {
       resultDF.createOrReplaceTempView("restaurantsTop5")
 
 
-      resultDF.orderBy($"number".desc).write.mode(SaveMode.Append).jdbc(url, "RTA_restaurantsTop5", new java.util.Properties() {
+      resultDF.orderBy($"number".desc).write.mode(SaveMode.Overwrite).jdbc(url, "RTA_restaurantsTop5", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)

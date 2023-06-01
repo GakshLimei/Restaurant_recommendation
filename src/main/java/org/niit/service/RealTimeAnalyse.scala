@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter
 class RealTimeAnalyse {
   def dataAnalysis(orders: DStream[Orders]): Unit = {
     hotCuisineTop10(orders)
-    hotCanteenTop2(orders)
-    hotPlatformTop3(orders)
+    analyseByTime(orders)
+    hotPlatformByTimeTop3(orders)
   }
 
   //Top10前十个用户最喜欢的菜品（用户评分）
@@ -35,7 +35,7 @@ class RealTimeAnalyse {
       val user = "root"
       val password = "Niit@123"
 
-      resultDF.write.mode(SaveMode.Append).jdbc(url, "RT_top10_cuisines", new java.util.Properties() {
+      resultDF.write.mode(SaveMode.Overwrite).jdbc(url, "RT_top10_cuisines", new java.util.Properties() {
         {
           setProperty("driver", "com.mysql.jdbc.Driver")
           setProperty("user", user)
@@ -50,7 +50,7 @@ class RealTimeAnalyse {
 
   //根据时间段统计餐厅下单量
 
-  private def hotCanteenTop2(orders: DStream[Orders]): Unit = {
+  private def analyseByTime(orders: DStream[Orders]): Unit = {
     val mapDS = orders.map(data => {
       (data.restaurant_id, data.order_time)
     })
@@ -110,14 +110,14 @@ class RealTimeAnalyse {
         .option("user", "root")
         .option("password", "Niit@123")
         .option("dbtable", "RT_hotCanteenTop2")
-        .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
+        .mode(SaveMode.Overwrite) // 追加模式，如果不存在就会自动的创建
         .save
     })
   }
 
 
   //根据时间段统计平台销量
-  private def hotPlatformTop3(orders: DStream[Orders]): Unit = {
+  private def hotPlatformByTimeTop3(orders: DStream[Orders]): Unit = {
     val mapDS = orders.map(data => {
       (data.app_name, data.order_time)
     })
@@ -177,7 +177,7 @@ class RealTimeAnalyse {
         .option("user", "root")
         .option("password", "Niit@123")
         .option("dbtable", "RT_hotCanteenTop3") //写到edu表里面
-        .mode(SaveMode.Append) // 追加模式，如果不存在就会自动的创建
+        .mode(SaveMode.Overwrite) // 追加模式，如果不存在就会自动的创建
         .save
 
     })

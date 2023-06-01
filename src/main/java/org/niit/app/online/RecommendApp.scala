@@ -1,4 +1,4 @@
-package org.niit.app
+package org.niit.app.online
 
 import org.niit.common.TApp
 import org.niit.controller.RecommendController

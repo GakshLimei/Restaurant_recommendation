@@ -1,4 +1,4 @@
-package org.niit.app
+package org.niit.app.offline
 
 import org.niit.common.TApp
 import org.niit.controller.Write2MySQLController
