@@ -7,8 +7,8 @@ class RealTimeAnlsController {
   private val realTimeAnalyse = new RealTimeAnalyse
 
   def dispatch(): Unit = {
-    val answerData = DataHandler.kafkaOrdersDatHandler("BD2", "takeaway")
-    realTimeAnalyse.dataAnalysis(answerData)
+    val orderData = DataHandler.kafkaOrdersDatHandler("BD2", "takeaway")
+    realTimeAnalyse.dataAnalysis(orderData)
     DataHandler.startAndAwait()
   }
 }

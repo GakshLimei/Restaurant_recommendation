@@ -23,9 +23,9 @@ class RealTimeAnalyse {
   dbProperties.setProperty("password", "Niit@123")
   dbProperties.setProperty("driver", "com.mysql.jdbc.Driver")
   def dataAnalysis(orders: DStream[Orders]): Unit = {
-    hotCuisineTop10(orders)
+//    hotCuisineTop10(orders)
 //    analyseByTime(orders)
-//    hotPlatformByTimeTop3(orders)
+    hotPlatformByTimeTop3(orders)
   }
 
 
@@ -133,9 +133,13 @@ class RealTimeAnalyse {
   //根据时间段统计平台销量
   private def hotPlatformByTimeTop3(orders: DStream[Orders]): Unit = {
     val mapDS = orders.map(data => {
-      (data.app_name, data.order_time)
+      (data.app_name, data.order_time,data.restaurant_id)
     })
     mapDS.foreachRDD(rdd => {
+      val ordersDF =  rdd.toDF("app_name","order_time","restaurant_id")
+      ordersDF.write.mode(SaveMode.Overwrite)
+        .jdbc(url,"RT_hotCanteenTop3",dbProperties)
+      ordersDF.show()
       // 对 RDD 进行处理，将时间段划分为早上、中午、下午和晚上
       val timePeriodRDD = rdd.map(record => {
         val timestampStr = record._2
@@ -177,22 +181,22 @@ class RealTimeAnalyse {
 
       val orderStatsDF = timePeriodRDD.toDF("time", "order_time")
       println("---------根据时间段统计平台下单量test---------")
-
+      orderStatsDF.show
 
       // 分组操作，统计每个时间段内每个餐厅的订单数
       val countResult: DataFrame = orderStatsDF.groupBy($"time").count()
       // 将结果输出到 MySQL 数据库中
 
 
-      countResult.write
-        .format("jdbc")
-        .option("url", "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8")
-        .option("driver", "com.mysql.jdbc.Driver")
-        .option("user", "root")
-        .option("password", "Niit@123")
-        .option("dbtable", "RT_hotCanteenTop3") //写到edu表里面
-        .mode(SaveMode.Overwrite) // 追加模式，如果不存在就会自动的创建
-        .save
+//      countResult.write
+//        .format("jdbc")
+//        .option("url", "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8")
+//        .option("driver", "com.mysql.jdbc.Driver")
+//        .option("user", "root")
+//        .option("password", "Niit@123")
+//        .option("dbtable", "RT_hotCanteenTop3") //写到edu表里面
+//        .mode(SaveMode.Overwrite) // 追加模式，如果不存在就会自动的创建
+//        .save
 
     })
   }
