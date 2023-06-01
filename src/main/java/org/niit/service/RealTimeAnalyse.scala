@@ -1,51 +1,65 @@
 package org.niit.service
 
 
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.rdd
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions.{avg, dense_rank, desc}
+import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
 import org.niit.bean.Orders
+import org.niit.util.SparkUtil
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Properties
 
 class RealTimeAnalyse {
+
+  val spark = SparkUtil.takeSpark()
+  import spark.implicits._
+  val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
+  val dbProperties = new Properties()
+  dbProperties.setProperty("user", "root")
+  dbProperties.setProperty("password", "Niit@123")
+  dbProperties.setProperty("driver", "com.mysql.jdbc.Driver")
   def dataAnalysis(orders: DStream[Orders]): Unit = {
     hotCuisineTop10(orders)
-    analyseByTime(orders)
-    hotPlatformByTimeTop3(orders)
+//    analyseByTime(orders)
+//    hotPlatformByTimeTop3(orders)
   }
 
-  //Top10前十个用户最喜欢的菜品（用户评分）
-  private def hotCuisineTop10(orders: DStream[Orders]): Unit = {
-    val mapDS = orders.map(data => {
-      (data.food_category, data.score)
-    })
-    mapDS.foreachRDD(rdd => {
-      val sortRDD = rdd.sortBy(_._2, false)
-      val top10 = sortRDD.take(10)
-      println("---------Top10前十个用户最喜欢的菜品（用户评分）---------")
-      top10.foreach(println)
-      val spark = SparkSession.builder.config(rdd.sparkContext.getConf).getOrCreate()
-      import spark.implicits._
 
-      val resultDF = spark.createDataset(top10).toDF("category", "score")
-      resultDF.createOrReplaceTempView("top10_cuisine")
-
-      val url = "jdbc:mysql://node1:3306/Takeaway?useUnicode=true&characterEncoding=utf8"
-      val user = "root"
-      val password = "Niit@123"
-
-      resultDF.write.mode(SaveMode.Overwrite).jdbc(url, "RT_top10_cuisines", new java.util.Properties() {
-        {
-          setProperty("driver", "com.mysql.jdbc.Driver")
-          setProperty("user", user)
-          setProperty("password", password)
-        }
-      })
+  def hotCuisineTop10(orders: DStream[Orders]) = {
+    // 先按照菜品名和评分进行分组，统计每个菜品的平均评分
+    orders.foreachRDD(rdd=>{
+      val ordersDF = rdd.toDF()
+      val foodAvgScoreDF = ordersDF
+      .groupBy($"food_category")
+      .agg(avg($"score").as("avg_score"))
 
 
-    })
+    // 再按照菜品进行分组，统计每个菜品的平均评分排名
+    val foodRankDF = foodAvgScoreDF
+      .withColumn("rank", dense_rank().over(Window.orderBy(desc("avg_score"))))
+      .filter($"rank" <= 10)
+
+
+    // 通过关联获取餐厅信息
+    println("---------Top10前十个用户最喜欢的菜品（用户评分）---------")
+    val rids = ordersDF.join(foodRankDF, Seq("food_category"))
+    rids.select($"food_category", $"avg_score" ,$"app_name",$"restaurant_id",$"rank")
+      .distinct()
+      .orderBy("rank")
+      .limit(10)
+      .show()
+
+    val res = rids.select($"food_category", $"avg_score" ,$"app_name",$"restaurant_id",$"rank")
+    res.write.mode(SaveMode.Overwrite)
+      .jdbc(url, "RT_top10_cuisines", dbProperties)
+  })
   }
+
+
 
 
   //根据时间段统计餐厅下单量
