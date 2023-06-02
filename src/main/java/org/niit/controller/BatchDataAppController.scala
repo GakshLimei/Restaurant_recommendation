@@ -8,7 +8,7 @@ import org.niit.service.BatchDataService
  * @desc:离线服务控制层
  */
 class BatchDataAppController {
-  //  离线分析
+
   private val batchDataService = new BatchDataService()
 
   def dispatch(): Unit = {

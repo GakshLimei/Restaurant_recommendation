@@ -43,6 +43,19 @@ class BatchDataService extends Serializable {
     //需求四：离线统计热门餐厅Top10
     hotrestaurantTop10(allInfoDS)
   }
+  def recommendService(): Unit = {
+    //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
+    //模型路径
+    val path = "output/batch_als_order_model/1685157225248"
+    //1.连接数据库
+    val takeawayDao = new BatchDataDao
+    val allInfoDS = takeawayDao.getTakeawayData()
+    allInfoDS.show()
+    //离线推荐一：根据用户推荐10个餐厅
+    recommendForAllUsers(allInfoDS, path)
+    //离线推荐二：根据餐厅推荐3个用户
+    recommendForAllItems(allInfoDS, path)
+  }
 
   //需求一：离线统计热门城市Top5
   def hotCityCountTop5(allInfoDS: Dataset[Orders2MySQL]): Unit = {
@@ -82,6 +95,7 @@ class BatchDataService extends Serializable {
       .limit(10)
       .show()
 
+    // 将高评分餐厅的信息写入数据库表 "Batch_Rating_Restaurant_Top10"
     val res = rids.select($"restaurant_id", $"avg_score", $"rank")
     res.write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Rating_Restaurant_Top10", dbProperties)
@@ -89,53 +103,47 @@ class BatchDataService extends Serializable {
 
   //需求三：离线统计热门菜品Top3
   def hotFoodCategoryTop3(allInfoDS: Dataset[Orders2MySQL]): Unit = {
+    // 根据菜品分类进行分组，统计每个分类的数量
     val foodhotTop3 = allInfoDS.groupBy('food_category)
-      .agg(count("*") as 'hot)
-      .orderBy('hot.desc)
-      .limit(3)
+      .agg(count("*") as 'hot) // 使用agg方法进行聚合计数，并将结果命名为'hot'
+      .orderBy('hot.desc) // 按照'hot'字段进行降序排序
+      .limit(3) // 限制结果集数量为3，仅保留前三名热门菜品分类
 
     println("---------离线统计热门菜品Top3---------")
+    // 将热门菜品分类结果写入数据库表，采用SaveMode.Overwrite模式覆盖已有数据
     foodhotTop3.toDF().write.mode(SaveMode.Overwrite)
-      .jdbc(url,
-        "Batch_Hot_Food_Top3", dbProperties)
-    foodhotTop3.show()
+      .jdbc(url, "Batch_Hot_Food_Top3", dbProperties)
+
+    foodhotTop3.show() // 显示热门菜品分类的统计结果
   }
 
   //需求四：离线统计热门餐厅Top10
   def hotrestaurantTop10(allInfoDS: Dataset[Orders2MySQL]): Unit = {
+    // 根据餐厅ID进行分组，统计每个餐厅的订单数量
     val hotrestaurantTop10 = allInfoDS.groupBy(Symbol("restaurant_id"))
-      .agg(count("*") as 'hot)
-      .orderBy('hot.desc)
-      .limit(3)
+      .agg(count("*") as 'hot) // 使用agg方法进行聚合计数，并将结果命名为'hot'
+      .orderBy('hot.desc) // 按照'hot'字段进行降序排序
+      .limit(3) // 限制结果集数量为3，仅保留前三名热门餐厅
+
     println("---------离线统计热门餐厅Top10---------")
+    // 将热门餐厅结果写入数据库表，采用SaveMode.Overwrite模式覆盖已有数据
     hotrestaurantTop10.toDF().write.mode(SaveMode.Overwrite)
       .jdbc(url, "Batch_Hot_Canteen_Top10", dbProperties)
-    hotrestaurantTop10.show(10)
+
+    hotrestaurantTop10.show(10) // 显示热门餐厅的统计结果，最多显示10个
   }
 
-  def recommendService(): Unit = {
-    //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
-    //模型路径
-    val path = "output/batch_als_order_model/1685157225248"
-    //1.连接数据库
-    val takeawayDao = new BatchDataDao
-    val allInfoDS = takeawayDao.getTakeawayData()
-    allInfoDS.show()
-    //离线推荐一：根据用户推荐10个餐厅
-    recommendForAllUsers(allInfoDS, path)
-    //离线推荐二：根据餐厅推荐3个用户
-    recommendForAllItems(allInfoDS, path)
-  }
 
   //离线推荐一：根据用户推荐10个餐厅
   def recommendForAllUsers(allInfoDS: Dataset[Orders2MySQL], path: String) = {
+    // 加载 ALS 模型
     val model = ALSModel.load(path)
 
     val ordersDF = allInfoDS.toDF()
     val userIdDF = ordersDF.select("user_id")
 
-    //5.使用模型给用户推荐餐厅  推荐10个高质量餐厅
-    //调用协同过滤模型 model 的 recommendForUserSubset() 方法。
+    // 使用模型给用户推荐餐厅，推荐10个高质量餐厅
+
     // 该方法需要传入两个参数：一个包含用户ID的DataFrame，和一个整数类型的参数 numItems，表示要返回的每个用户的推荐项目数量。
     val userRecs = model.recommendForUserSubset(userIdDF, 10)
 
@@ -144,7 +152,7 @@ class BatchDataService extends Serializable {
     userRecs.show(false) //执行 show() 方法,参数设置为 false，以便查看所有列的完整信息。
 
 
-    //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
+    // 处理推荐结果：取出用户ID和餐厅ID，拼接成字符串：id1,id2
     val userRecsDF = userRecs.as[(Int, Array[(Int, Float)])].map(t => {
       val userId: Int = t._1
       val restaurantId = t._2.map("餐厅ID_" + _._1).mkString(",")
@@ -152,28 +160,27 @@ class BatchDataService extends Serializable {
     }).toDF("user_id", "recommendations")
 
     val allInfoDF = ordersDF.join(userRecsDF, "user_id").select("user_id", "recommendations")
+
     // 将推荐结果存储到 MySQL 中
     val rectable = "Batch_recommendations_for_user"
     allInfoDF.write.mode(SaveMode.Overwrite)
       .jdbc(url, rectable, dbProperties)
-
-
   }
 
-  //离线推荐二：根据餐厅推荐3个用户
+  //离线推荐二：根据餐厅推荐10个用户
   def recommendForAllItems(allInfoDS: Dataset[Orders2MySQL], path: String): Unit = {
     val model = ALSModel.load(path)
 
     val ordersDF = allInfoDS.toDF()
 
-    //5.使用模型给用户推荐餐厅  推荐10个高质量客户
+    // 使用模型给用户推荐餐厅  推荐10个高质量客户
     //调用协同过滤模型 model 的 recommendForAllItems() 方法。
     val restRecs = model.recommendForAllItems(10)
     println("---------离线推荐根据餐厅推荐3个用户---------")
     restRecs.show(false)
 
 
-    //6.处理推荐结果： 取出学生id和餐厅id，拼接成字符串：id1,id2
+    // 处理推荐结果：取出餐厅ID和用户ID，拼接成字符串：id1,id2
     val userRecsDF = restRecs.as[(Int, Array[(Int, Float)])].map(t => {
       val restaurantId: Int = t._1
       val userId = t._2.map("客户ID_" + _._1).mkString(",")
@@ -181,6 +188,7 @@ class BatchDataService extends Serializable {
     }).toDF("restaurant_id", "recommendations")
 
     val allInfoDF1 = ordersDF.join(userRecsDF, "restaurant_id").select("restaurant_id", "recommendations")
+
     // 将推荐结果存储到 MySQL 中
     val rectable = "Batch_recommendations_for_restaurant"
     allInfoDF1.write.mode(SaveMode.Overwrite)
