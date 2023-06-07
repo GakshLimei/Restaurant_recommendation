@@ -176,7 +176,7 @@ class BatchDataService extends Serializable {
     // 使用模型给用户推荐餐厅  推荐10个高质量客户
     //调用协同过滤模型 model 的 recommendForAllItems() 方法。
     val restRecs = model.recommendForAllItems(10)
-    println("---------离线推荐根据餐厅推荐3个用户---------")
+    println("---------离线推荐根据餐厅推荐10个用户---------")
     restRecs.show(false)
 
 

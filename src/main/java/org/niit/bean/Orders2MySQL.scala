@@ -14,7 +14,7 @@ case class Orders2MySQL(user_id: String, //用户ID
                         restaurant_id: String, //餐厅ID
                         food_category: String, //菜品
                         order_id: String, //订单ID
-                        score: Int, //用户评分
+                        score: Double, //用户评分
                         order_time: String, //订单提交时间，yyyy-MM-dd HH:mm:ss字符串形式
                         ts: Timestamp //订单提交时间，时间戳形式
                        ) extends Serializable

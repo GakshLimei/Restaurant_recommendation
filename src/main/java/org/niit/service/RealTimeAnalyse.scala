@@ -24,7 +24,7 @@ class RealTimeAnalyse {
   dbProperties.setProperty("password", "Niit@123")
   dbProperties.setProperty("driver", "com.mysql.jdbc.Driver")
   def dataAnalysis(orders: DStream[Orders]): Unit = {
-//    hotCuisineTop10(orders)
+    hotCuisineTop10(orders)
 //    analyseByTime(orders)
     hotPlatformByTimeTop3(orders)
   }

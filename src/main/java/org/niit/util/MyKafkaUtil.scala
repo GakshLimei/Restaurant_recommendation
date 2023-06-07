@@ -1,10 +1,13 @@
 package org.niit.util
 
-import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
+
+import java.util.Properties
 
 /**
  * @作者 YanTianCheng
@@ -25,6 +28,30 @@ object MyKafkaUtil {
     //如果是 false，会需要手动维护 kafka 偏移量
     "enable.auto.commit" -> (true: java.lang.Boolean)
   )
+
+  def getKafkaProducer: KafkaProducer[String, String] = {
+    val props = new Properties()
+    props.setProperty("bootstrap.servers", "node1:9092")
+    props.setProperty("acks", "1")
+    props.setProperty("batch.size", "32768")
+    props.setProperty("linger.ms", "5")
+    props.setProperty("buffer.memory", "33554432")
+    props.setProperty("key.serializer", classOf[StringSerializer].getName)
+    props.setProperty("value.serializer", classOf[StringSerializer].getName)
+
+    new KafkaProducer[String, String](props)
+  }
+  def getKafkaConsumer(groupId: String): KafkaConsumer[String, String] = {
+    val props = new Properties()
+    props.setProperty("bootstrap.servers", "node1:9092")
+    props.setProperty("key.deserializer", classOf[StringDeserializer].getName)
+    props.setProperty("value.deserializer", classOf[StringDeserializer].getName)
+    props.setProperty("group.id", groupId)
+    props.setProperty("enable.auto.commit", "true")
+    props.setProperty("auto.commit.interval.ms", "1000")
+
+    new KafkaConsumer[String, String](props)
+  }
 
   def getKafkaStream(groupId: String, topic: String, ssc: StreamingContext):
   InputDStream[ConsumerRecord[String, String]] = {
