@@ -28,7 +28,7 @@ class RecommendService {
       //      HBaseUtil.setHTable("bigdata:takeaway")
       //      val value = HBaseUtil.getData(new Get(Bytes.toBytes("als_model-recommended_orders_id")))
       //      val path = value(0)
-      val path = "output/batch_als_order_model/1685549315179"
+      val path = "output/als_model/1685549315179"
 
       //2.加载模型
       val model = ALSModel.load(path)
