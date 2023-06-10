@@ -22,6 +22,11 @@
       <option name="url" value="https://repository.cloudera.com/artifactory/cloudera-repos/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="http://maven.aliyun.com/nexus/content/repositories/central/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="scala-tools.org" />
       <option name="name" value="Scala-Tools Maven2 Repository" />
       <option name="url" value="http://scala-tools.org/repo-releases" />
