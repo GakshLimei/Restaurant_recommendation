@@ -46,7 +46,7 @@ class BatchDataService extends Serializable {
   def recommendService(): Unit = {
     //离线推荐，对历史数据进行分析历史数据一般会存在数据库中（MySQL/HBase）
     //模型路径
-    val path = "output/batch_als_order_model/1685157225248"
+    val path = "output/batch_als_order_model/1697595111714"
     //1.连接数据库
     val takeawayDao = new BatchDataDao
     val allInfoDS = takeawayDao.getTakeawayData()
